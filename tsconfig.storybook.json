@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "types": ["vite/client", "react", "react-dom", "node"], // Add Node.js types (used by Storybook internally)
+    "esModuleInterop": true, // Ensure compatibility with ES modules
+    "moduleResolution": "Node",
+    "jsx": "react-jsx", // Use JSX runtime for React
+    "allowSyntheticDefaultImports": true, // Allow default imports for modules
+    "strict": true
+  },
+  "exclude": ["node_modules", "build"], // Exclude unnecessary files
+  "extends": "./tsconfig.json", // Inherit settings from the main tsconfig.json
+  "include": [
+    "./storybook", // Include Storybook configuration files
+    "./src/**/*.stories.@(ts|tsx|js|jsx)" // Include all story files
+  ]
+}

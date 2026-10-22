@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "types": ["cypress", "@cypress/react", "@cypress/vite-dev-server", "cypress-axe"], // Add Cypress-specific types
+    "isolatedModules": false, // Required for Cypress
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true
+  },
+
+  "exclude": [
+    "node_modules", // Exclude external dependencies
+    "build" // Exclude build output
+  ],
+  "extends": "./tsconfig.json",
+  "include": [
+    "cypress/**/*.ts",
+    "cypress/**/*.tsx",
+    "cypress/**/*.d.ts", // Include TypeScript declaration files
+    "cypress.config.mjs",
+    "./support/**/*.ts",
+    "cypress/support/**/*.d.ts" // Explicitly include component.d.ts
+  ],
+  "files": ["cypress/support/component.d.ts"] // Manually include the file
+}

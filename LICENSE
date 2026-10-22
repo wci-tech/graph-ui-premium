@@ -1,0 +1,184 @@
+# 🔒 WCI Commercial License Agreement (WCI-CLA)
+
+Version 1.0 — Effective 2026
+Wealthcraft Innovations Private Limited
+
+## 1. DEFINITIONS
+
+1. WCI — Wealthcraft Innovations Private Limited, its affiliates, and subsidiaries.
+2. Software — All source code, binaries, components, UI libraries, design tokens, assets, documentation, APIs, builders, runtime engines, and related materials.
+3. Licensee / You — The individual or entity using the Software.
+4. Project — One (1) production application or website where the Software is integrated.
+5. Authorized Users — Internal employees or contractors under a valid license.
+
+## 2. LICENSE GRANT
+
+WCI grants you a non-exclusive, non-transferable, non-sublicensable, revocable commercial license to use the Software within the scope of your purchased plan.
+
+**You May:**
+
+1. Use the Software in ONE (1) production Project per license
+2. Use it across dev, QA, staging environments
+3. Deploy your Project to unlimited end-users
+4. Modify the Software for internal use only
+5. Use compiled/minified builds in production
+
+## 3. LICENSE RESTRICTIONS — YOU MAY NOT
+
+### 3.1 Redistribution
+
+Share, publish, upload, or distribute any part of the Software
+
+Upload to GitHub, GitLab, Bitbucket, NPM, CDNs, or any public system
+
+### 3.2 Resale / Sublicensing
+
+Sell, rent, lease, sublicense, or repackage the Software
+
+Use it to build competing UI libraries, builders, SaaS products, SDKs
+
+### 3.3 External Access
+
+Provide access to anyone not covered under your license
+
+Provide the Software to clients (they must purchase their own license)
+
+### 3.4 Open-Source Restrictions
+
+Release WCI code under MIT, Apache, GPL, or any open-source license
+
+### 3.5 Competitive Use
+
+Create derivative or competing products
+
+Replicate UI/UX patterns for commercial redistribution
+
+### 3.6 Copyright
+
+You may not remove or modify:
+
+License headers
+
+Copyright notices
+
+Embedded validation or tracking metadata
+
+## 4. OWNERSHIP
+
+### The Software is licensed, not sold.
+
+**WCI retains full ownership of:**
+
+1. Code (source & compiled)
+
+2. UI components, hooks, utilities
+
+3. Design tokens & theme engine
+
+4. Runtime engine
+
+5. Builders & editors
+
+6. SDKs
+
+7. Documentation
+
+8. Branding & trademarks
+
+9. No ownership rights transfer to You.
+
+## 5. LICENSE ACTIVATION & VALIDATION
+
+**The Software may require:**
+
+1. License keys
+
+2. API or server-based validation
+
+3. GitHub PAT authentication
+
+4. Domain or Project binding
+
+5. Periodic online verification
+
+**WCI may suspend or revoke licenses in cases of:**
+
+1. Expiration
+
+2. Misuse or illegal sharing
+
+3. Using the Software outside the licensed scope
+
+4. Circumventing licensing mechanisms
+
+## 6. SUPPORT, UPDATES & UPGRADES
+
+**If included in your plan, WCI may provide:**
+
+1. Bug fixes
+
+2. Security patches
+
+3. Feature updates
+
+4. New components
+
+5. Documentation updates
+
+6. Priority support
+
+7. No updates are guaranteed after license expiration.
+
+## 7. TERMINATION
+
+**Your license terminates automatically if:**
+
+1. Payment fails
+
+2. You violate any clause
+
+3. You leak, distribute, or expose source code
+
+4. You bypass licensing systems
+
+5. Upon Termination, You Must:
+
+6. Cease all use of the Software
+
+7. Remove it from all applications
+
+8. Delete all copies and backups
+
+9. WCI may pursue legal action for violations.
+
+## 8. WARRANTY DISCLAIMER
+
+The Software is provided “AS IS” without warranties of any kind.
+WCI disclaims all implied warranties, including merchantability, fitness for purpose, and non-infringement.
+
+## 9. LIMITATION OF LIABILITY
+
+**To the fullest extent permitted by law:**
+
+WCI is not liable for indirect, special, incidental, or consequential damages
+
+WCI’s total liability shall not exceed the amount paid by You for the license
+
+## 10. GOVERNING LAW
+
+**This Agreement is governed by the laws of India, including:**
+
+1. The Information Technology Act, 2000
+
+2. The Indian Contract Act, 1872
+
+3. The Copyright Act, 1957
+
+**Courts in Delhi NCR have exclusive jurisdiction.**
+
+## 11. CONTACT
+
+**Wealthcraft Innovations Private Limited**
+
+📧 Email: sales@wci.tech | sales@wealthcraftinnovations.com
+🌐 Website: https://wci.tech
