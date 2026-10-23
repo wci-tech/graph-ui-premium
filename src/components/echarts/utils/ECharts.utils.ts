@@ -1,106 +1,22 @@
-// import type { EChartsOption } from 'echarts';
-
-// import { getAreaConfig } from '../components/area-chart/area.config';
-// import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
-
-// export const isEChartsDefinition = (definition: unknown): definition is EChartsDefinition => {
-//   if (!definition || typeof definition !== 'object') return false;
-
-//   return 'series' in definition && Array.isArray((definition as EChartsDefinition).series);
-// };
-
-// export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption => ({
-//   backgroundColor: 'transparent',
-//   animation: true,
-
-//   tooltip: {
-//     trigger: type === 'pie' ? 'item' : 'axis',
-//     axisPointer: {
-//       type: type === 'bar' || type === 'bar-line' ? 'shadow' : 'line',
-//     },
-//     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-//     textStyle: {
-//       color: '#333333',
-//     },
-//   },
-// });
-
-// export const getChartSpecificEChartsConfig = (definition: EChartsDefinition): EChartsOption => {
-//   switch (definition.type) {
-//     case 'area':
-//       return getAreaConfig(definition);
-
-//     default:
-//       return {};
-//   }
-// };
-
-// export const createEChartsOptions = (definition: unknown): EChartsOption => {
-//   if (!isEChartsDefinition(definition)) return {};
-
-//   const type = definition.type ?? 'line';
-
-//   return {
-//     ...getBaseEChartsConfig(type),
-//     ...getChartSpecificEChartsConfig(definition),
-//   };
-// };
-
 import type { EChartsOption } from 'echarts';
+
+import { isRecord } from '@/common/utils/Common.utils';
 
 import { getAreaConfig } from '../components/area-chart/area.config';
 import type {
-  AreaChartDefinition,
-  AreaChartResolvedColors,
-  AreaChartResolvedSeries,
-} from '../components/area-chart/base/BaseAreaChart.utils';
-import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === 'string');
-
-const isNumberArray = (value: unknown): value is number[] =>
-  Array.isArray(value) && value.every((item) => typeof item === 'number');
-
-const isAreaChartResolvedColors = (value: unknown): value is AreaChartResolvedColors => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  return (
-    isStringArray(value['series']) &&
-    typeof value['axisText'] === 'string' &&
-    typeof value['axisLine'] === 'string' &&
-    typeof value['grid'] === 'string' &&
-    typeof value['tooltipBackground'] === 'string' &&
-    typeof value['tooltipText'] === 'string' &&
-    typeof value['tooltipBorder'] === 'string'
-  );
-};
-
-const isAreaChartResolvedSeries = (value: unknown): value is AreaChartResolvedSeries => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  return (
-    typeof value['label'] === 'string' &&
-    isNumberArray(value['data']) &&
-    typeof value['color'] === 'string' &&
-    typeof value['pointColor'] === 'string' &&
-    (value['pointRadius'] === undefined || typeof value['pointRadius'] === 'number') &&
-    (value['borderWidth'] === undefined || typeof value['borderWidth'] === 'number')
-  );
-};
+  EChartsDefinition,
+  SupportedEChartType,
+} from '../ECharts.types';
 
 /**
- * Checks whether the value contains the generic
- * ECharts definition structure.
+ * Checks whether the value contains the generic ECharts definition structure.
+ *
+ * @param definition - Definition to validate.
+ * @returns Whether the value is a valid ECharts definition.
  */
-export const isEChartsDefinition = (definition: unknown): definition is EChartsDefinition => {
+export const isEChartsDefinition = (
+  definition: unknown,
+): definition is EChartsDefinition => {
   if (!isRecord(definition)) {
     return false;
   }
@@ -109,45 +25,14 @@ export const isEChartsDefinition = (definition: unknown): definition is EChartsD
 };
 
 /**
- * Checks whether the value is a fully normalized
- * AreaChart definition.
+ * Creates the base ECharts configuration shared by all supported chart types.
  *
- * The guard starts from unknown intentionally because
- * AreaChartDefinition does not extend EChartsDefinition.
+ * @param type - Supported ECharts chart type.
+ * @returns Base ECharts configuration.
  */
-const isAreaChartDefinition = (definition: unknown): definition is AreaChartDefinition => {
-  if (!isRecord(definition)) {
-    return false;
-  }
-
-  if (definition['type'] !== 'area') {
-    return false;
-  }
-
-  if (!isStringArray(definition['labels'])) {
-    return false;
-  }
-
-  const appearance = definition['appearance'];
-
-  if (appearance !== 'basic' && appearance !== 'smooth') {
-    return false;
-  }
-
-  if (!isAreaChartResolvedColors(definition['areaChartColors'])) {
-    return false;
-  }
-
-  const series = definition['series'];
-
-  if (!Array.isArray(series)) {
-    return false;
-  }
-
-  return series.every(isAreaChartResolvedSeries);
-};
-
-export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption => ({
+export const getBaseEChartsConfig = (
+  type: SupportedEChartType,
+): EChartsOption => ({
   backgroundColor: 'transparent',
 
   animation: true,
@@ -159,37 +44,47 @@ export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption =
       type: type === 'bar' || type === 'bar-line' ? 'shadow' : 'line',
     },
 
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'var(--wci-overlay-white-10)',
 
     textStyle: {
-      color: '#333333',
+      color: 'var(--wci-black)',
     },
   },
 });
 
 /**
- * Resolves chart-specific configuration.
+ * Resolves the chart-specific ECharts configuration.
  *
- * Chart-specific definitions are narrowed from unknown
- * instead of being forced into EChartsDefinition.
+ * Each chart type owns its configuration and receives the common
+ * ECharts definition from this dispatcher.
+ *
+ * @param definition - Normalized ECharts chart definition.
+ * @returns Chart-specific ECharts configuration.
  */
-export const getChartSpecificEChartsConfig = (definition: unknown): EChartsOption => {
-  if (isAreaChartDefinition(definition)) {
-    return getAreaConfig(definition);
-  }
+export const getChartSpecificEChartsConfig = (
+  definition: EChartsDefinition,
+): EChartsOption => {
+  switch (definition.type) {
+    case 'area':
+      return getAreaConfig(definition);
 
-  return {};
+    default:
+      return {};
+  }
 };
 
-export const createEChartsOptions = (definition: unknown): EChartsOption => {
-  if (isAreaChartDefinition(definition)) {
-    return {
-      ...getBaseEChartsConfig(definition.type),
-
-      ...getAreaConfig(definition),
-    };
-  }
-
+/**
+ * Creates the complete ECharts option configuration.
+ *
+ * Combines the shared ECharts configuration with the configuration
+ * provided by the resolved chart type.
+ *
+ * @param definition - Chart definition to convert.
+ * @returns Complete ECharts option configuration.
+ */
+export const createEChartsOptions = (
+  definition: unknown,
+): EChartsOption => {
   if (!isEChartsDefinition(definition)) {
     return {};
   }

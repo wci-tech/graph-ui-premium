@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+
 import BarChartEngine from './engine/BarChartEngine';
 import type { BarChartProps } from './BarChart.types';
 

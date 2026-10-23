@@ -1,3 +1,5 @@
+import { compactObject } from '@wci-tech/core-ui-premium';
+
 import type {
   AreaChartDataset,
   AreaChartEffect,
@@ -15,39 +17,30 @@ const CHARTJS_AREA_EFFECTS: readonly AreaChartEffect[] = [
   'staggered-reveal',
 ];
 
-const resolveEffect = (effect: EngineRendererProps['effect']): AreaChartEffect =>
-  CHARTJS_AREA_EFFECTS.includes(effect as AreaChartEffect) ? (effect as AreaChartEffect) : 'none';
+const resolveEffect = (
+  effect: EngineRendererProps['effect'],
+): AreaChartEffect =>
+  CHARTJS_AREA_EFFECTS.includes(effect as AreaChartEffect)
+    ? (effect as AreaChartEffect)
+    : 'none';
 
-const toAreaChartData = (series: EngineRendererProps['data']['series']): AreaChartDataset[] =>
-  series.map(
-    (seriesItem): AreaChartDataset => ({
+const resolveAppearance = (
+  appearance: EngineRendererProps['appearance'],
+): AreaChartProps['appearance'] =>
+  appearance === 'basic' || appearance === 'smooth' ? appearance : undefined;
+
+const toAreaChartData = (
+  series: EngineRendererProps['data']['series'],
+): AreaChartDataset[] =>
+  series.map((seriesItem) =>
+    compactObject({
       label: seriesItem.label,
-
       data: Array.from(seriesItem.data),
 
-      ...(seriesItem.color
-        ? {
-            color: seriesItem.color,
-          }
-        : {}),
-
-      ...(seriesItem.pointColor
-        ? {
-            pointColor: seriesItem.pointColor,
-          }
-        : {}),
-
-      ...(seriesItem.pointRadius !== undefined
-        ? {
-            pointRadius: seriesItem.pointRadius,
-          }
-        : {}),
-
-      ...(seriesItem.borderWidth !== undefined
-        ? {
-            borderWidth: seriesItem.borderWidth,
-          }
-        : {}),
+      color: seriesItem.color,
+      pointColor: seriesItem.pointColor,
+      pointRadius: seriesItem.pointRadius,
+      borderWidth: seriesItem.borderWidth,
     }),
   );
 
@@ -57,65 +50,22 @@ export const adaptChartJSAreaProps = ({
   options,
   appearance,
   effect,
-
   showDownload,
   downloadPlacement,
   customStyles,
-
   className,
   testId,
-}: EngineRendererProps): AreaChartProps => ({
-  labels: Array.from(data.labels),
-
-  data: toAreaChartData(data.series),
-
-  effect: resolveEffect(effect),
-
-  ...(colors
-    ? {
-        colors,
-      }
-    : {}),
-
-  ...(appearance === 'basic' || appearance === 'smooth'
-    ? {
-        appearance,
-      }
-    : {}),
-
-  ...(options
-    ? {
-        options,
-      }
-    : {}),
-
-  ...(showDownload !== undefined
-    ? {
-        showDownload,
-      }
-    : {}),
-
-  ...(downloadPlacement
-    ? {
-        downloadPlacement,
-      }
-    : {}),
-
-  ...(customStyles
-    ? {
-        rendererCustomStyles: customStyles,
-      }
-    : {}),
-
-  ...(className
-    ? {
-        className,
-      }
-    : {}),
-
-  ...(testId
-    ? {
-        testId,
-      }
-    : {}),
-});
+}: EngineRendererProps): AreaChartProps =>
+  compactObject({
+    labels: Array.from(data.labels),
+    data: toAreaChartData(data.series),
+    effect: resolveEffect(effect),
+    colors,
+    appearance: resolveAppearance(appearance),
+    options,
+    showDownload,
+    downloadPlacement,
+    rendererCustomStyles: customStyles,
+    className,
+    testId,
+  });

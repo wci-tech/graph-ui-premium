@@ -51,7 +51,7 @@ const getCanvasStyles = () => css`
 
 const getDownloadWrapperStyles = (theme: ITheme, placement: DownloadPlacement) => {
   const horizontalOffset = theme.spacing.get(10);
-  const verticalOffset = theme.spacing.get(-50);
+  const verticalOffset = theme.spacing.get(-20);
 
   return css`
     position: absolute;

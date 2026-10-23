@@ -4,12 +4,21 @@ import type { DownloadFormat } from '../ChartJS.types';
 import { CHART_JS_EXPORT_FILE_NAME } from '../utils/ChartJS.constants';
 import { createSvgDownloadUrl } from '../utils/ChartJS.utils';
 
-export const useChartDownload = (canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
+const IMAGE_MIME_TYPES = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+} as const;
+
+export const useChartDownload = (
+  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+) => {
   const handleDownload = useCallback(
     (format: DownloadFormat) => {
       const canvas = canvasRef.current;
 
-      if (!canvas) return;
+      if (!canvas) {
+        return;
+      }
 
       const link = document.createElement('a');
 
@@ -25,9 +34,9 @@ export const useChartDownload = (canvasRef: React.RefObject<HTMLCanvasElement | 
         return;
       }
 
-      const imageType = format === 'jpg' ? 'jpeg' : format;
+      const mimeType = IMAGE_MIME_TYPES[format];
 
-      link.href = canvas.toDataURL(`image/${imageType}`);
+      link.href = canvas.toDataURL(mimeType);
       link.download = `${CHART_JS_EXPORT_FILE_NAME}.${format}`;
       link.click();
     },

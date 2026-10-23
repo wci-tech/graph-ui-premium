@@ -1,10 +1,14 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
 
-import type { ChartColors, ChartCustomStyles, DownloadPlacement } from '@/engines/engine.types';
+import type { ChartCustomStyles, DownloadPlacement } from '@/engines/engine.types';
 
-import type { ChartJSOptions } from '../../ChartJS.types';
+import type {
+  ChartJSData,
+  ChartJSOptions,
+  ChartjsProps,
+} from '../../ChartJS.types';
 import type { ChartJSEffect } from '../../common-effects';
 
 export type BarChartEffect = ChartJSEffect;
@@ -14,12 +18,7 @@ export interface BarChartDataset {
   readonly data: number[];
 
   /**
-   * Dataset-level color override.
-   *
-   * Precedence:
-   * root graph palette
-   * -> colors.series[index]
-   * -> dataset.color
+   * Overrides the automatically assigned series color.
    */
   readonly color?: string;
 
@@ -44,6 +43,39 @@ export interface BarChartDataset {
   readonly barPercentage?: number;
 }
 
+export interface BarChartColors {
+  /**
+   * Overrides the automatic series palette.
+   */
+  readonly series?: readonly string[];
+
+  readonly axisText?: string;
+  readonly axisLine?: string;
+  readonly grid?: string;
+
+  readonly tooltipBackground?: string;
+  readonly tooltipText?: string;
+  readonly tooltipBorder?: string;
+}
+
+/**
+ * Internal resolved colors.
+ *
+ * CSS variables and consumer overrides have already
+ * been converted to values that can be used by Canvas.
+ */
+export interface BarChartResolvedColors {
+  readonly series: readonly string[];
+
+  readonly axisText: string;
+  readonly axisLine: string;
+  readonly grid: string;
+
+  readonly tooltipBackground: string;
+  readonly tooltipText: string;
+  readonly tooltipBorder: string;
+}
+
 export interface BarChartCustomStyles {
   readonly wrapper?: StyleType;
   readonly chart?: StyleType;
@@ -51,14 +83,19 @@ export interface BarChartCustomStyles {
 
 export type BarChartOptions = ChartJSOptions & {
   readonly horizontal?: boolean;
+
   readonly boldLabels?: boolean;
   readonly boldLegends?: boolean;
+
   readonly showLegend?: boolean;
   readonly isBoxVisible?: boolean;
+
   readonly chartBackground?: string;
+
   readonly barWidth?: number;
   readonly categoryPercentage?: number;
   readonly barPercentage?: number;
+
   readonly crosshair?: boolean;
 };
 
@@ -66,26 +103,68 @@ export interface BarChartProps {
   readonly labels: string[];
   readonly data: BarChartDataset[];
 
-  readonly colors?: ChartColors;
-
   readonly effect?: BarChartEffect;
+
+  /**
+   * Convenient color overrides.
+   * Unspecified colors fall back to WCI chart tokens.
+   */
+  readonly colors?: BarChartColors;
 
   readonly options?: BarChartOptions;
 
   /**
-   * Bar-chart-specific styles.
+   * BarChart-specific structural styles.
    */
   readonly customStyles?: BarChartCustomStyles;
 
   /**
-   * Shared Chart renderer controls.
+   * Shared renderer controls passed to Chartjs.
    */
   readonly showDownload?: boolean;
+
   readonly downloadPlacement?: DownloadPlacement;
+
   readonly rendererCustomStyles?: ChartCustomStyles;
 
   readonly className?: string;
+
   readonly testId?: string;
 
   readonly children?: ReactNode;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Hook Types                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export type UseBarChartProps = Pick<
+  BarChartProps,
+  | 'data'
+  | 'labels'
+  | 'colors'
+  | 'options'
+  | 'effect'
+  | 'customStyles'
+  | 'rendererCustomStyles'
+  | 'className'
+  | 'testId'
+>;
+
+export interface BarChartWrapperProps {
+  readonly className?: string;
+  readonly 'data-testid'?: string;
+  readonly 'data-effect'?: string;
+}
+
+export interface UseBarChartReturn {
+  readonly wrapperRef: RefObject<HTMLDivElement | null>;
+
+  readonly processedData: ChartJSData;
+
+  readonly barOptions: ChartjsProps['options'] | undefined;
+
+  readonly wrapperProps: BarChartWrapperProps;
+
+  readonly isReady: boolean;
 }

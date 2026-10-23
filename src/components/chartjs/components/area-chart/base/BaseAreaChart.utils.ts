@@ -1,5 +1,6 @@
 import type { ScriptableContext, TooltipItem } from 'chart.js';
 
+import { CHART_COLOR_VARIABLES, CHART_TOKEN_VARIABLES } from '@/common/constants/Chart.colors';
 import type {
   ChartJSData,
   ChartJSDataset,
@@ -13,11 +14,9 @@ import type {
   AreaChartOptions,
 } from '../AreaChart.types';
 
-import {
-  AREA_CHART_COLOR_VARIABLES,
-  AREA_CHART_CONFIG,
-  AREA_CHART_TOKEN_VARIABLES,
-} from './BaseAreaChart.constants';
+import { AREA_CHART_CONFIG } from './BaseAreaChart.constants';
+
+
 
 export interface AreaChartResolvedColors {
   readonly series: readonly string[];
@@ -102,7 +101,7 @@ const resolveColor = (styles: CSSStyleDeclaration, color: string): string => {
 };
 
 const resolveDefaultSeriesColors = (styles: CSSStyleDeclaration): readonly string[] =>
-  AREA_CHART_COLOR_VARIABLES.map((variableName) =>
+  CHART_COLOR_VARIABLES.map((variableName) =>
     resolveColor(styles, resolveCssVariable(styles, variableName)),
   );
 
@@ -128,30 +127,30 @@ export const resolveAreaChartColors = (
 
     axisText: colors?.axisText
       ? resolveColor(styles, colors.axisText)
-      : resolveColor(styles, resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.axisText)),
+      : resolveColor(styles, resolveCssVariable(styles, CHART_TOKEN_VARIABLES.axisText)),
 
     axisLine: colors?.axisLine
       ? resolveColor(styles, colors.axisLine)
-      : resolveColor(styles, resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.axisLine)),
+      : resolveColor(styles, resolveCssVariable(styles, CHART_TOKEN_VARIABLES.axisLine)),
 
     grid: colors?.grid
       ? resolveColor(styles, colors.grid)
-      : resolveColor(styles, resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.grid)),
+      : resolveColor(styles, resolveCssVariable(styles, CHART_TOKEN_VARIABLES.grid)),
 
     tooltipBackground: colors?.tooltipBackground
       ? resolveColor(styles, colors.tooltipBackground)
       : resolveColor(
-          styles,
-          resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipBackground),
-        ),
+        styles,
+        resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBackground),
+      ),
 
     tooltipText: colors?.tooltipText
       ? resolveColor(styles, colors.tooltipText)
-      : resolveColor(styles, resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipText)),
+      : resolveColor(styles, resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipText)),
 
     tooltipBorder: colors?.tooltipBorder
       ? resolveColor(styles, colors.tooltipBorder)
-      : resolveColor(styles, resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipBorder)),
+      : resolveColor(styles, resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBorder)),
   };
 };
 

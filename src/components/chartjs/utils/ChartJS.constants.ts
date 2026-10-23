@@ -10,6 +10,6 @@ export const DOWNLOAD_ITEMS = DOWNLOAD_FORMATS.map((format) => ({
 export const CHART_JS_EXPORT_FILE_NAME = 'chart-export';
 
 export const CHART_JS_CSS_VARIABLES = {
-  lineColor: '--chartjs-line-color',
-  labelColor: '--chartjs-label-color',
+  lineColor: '--chart-1-line-color',
+  labelColor: '--chart-1-label-color',
 } as const;

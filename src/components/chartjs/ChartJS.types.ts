@@ -79,6 +79,8 @@ export type ChartjsProps = {
   showDownload?: boolean;
   downloadPlacement?: DownloadPlacement;
   customStyles?: ChartCustomStyles;
+  ariaLable?: string;
+  downloadText?: string;
 };
 
 export type LineSeries = {

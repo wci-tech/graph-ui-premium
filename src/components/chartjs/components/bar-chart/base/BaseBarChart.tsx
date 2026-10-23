@@ -15,12 +15,10 @@ export const BaseBarChart = ({
   labels,
   colors,
   options,
-  effect = 'none',
-
+  effect,
   showDownload = true,
   downloadPlacement = 'top-right',
   rendererCustomStyles,
-
   customStyles,
   className,
   testId = 'bar-chart-test-id',

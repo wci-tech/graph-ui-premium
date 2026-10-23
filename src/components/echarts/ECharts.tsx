@@ -10,6 +10,8 @@ import type { DownloadFormat, EChartsProps } from './ECharts.types';
 export const ECharts = ({
   options,
   chartId,
+  ariaLable,
+  downloadText,
   showDownload = true,
   downloadPlacement = 'top-right',
   customStyles = {},
@@ -41,12 +43,16 @@ export const ECharts = ({
             <div
               tabIndex={0}
               role="button"
-              aria-label="Download chart"
+              aria-label={ariaLable || 'Download chart'}
               css={[styles.labelWrapper, customStyles.downloadLabel]}
             >
-              <Typography variant="span">Download</Typography>
+              <Typography variant="span">{downloadText || 'Download'}</Typography>
 
-              <Icon name="arrowDown" color="black" />
+              <Icon
+                name="arrowDown"
+                color="black"
+                customStyles={css([customStyles.downloadIcon])}
+              />
             </div>
           </PopOver>
         </div>

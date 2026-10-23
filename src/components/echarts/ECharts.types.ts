@@ -44,6 +44,8 @@ export type EChartsProps = {
   showDownload?: boolean;
   downloadPlacement?: DownloadPlacement;
   customStyles?: ChartCustomStyles;
+  ariaLable?: string;
+  downloadText?: string;
 };
 
 export type EChartsDownloadItem = {

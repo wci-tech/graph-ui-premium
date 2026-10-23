@@ -1,56 +1,20 @@
-import { type RefObject, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
 
-import type { ChartJSData, ChartjsProps } from '@/components/chartjs/ChartJS.types';
 import { createPointHaloPlugin } from '@/components/chartjs/plugin/PointHaloPlugin';
 
+import type {
+  AreaChartResolvedColors,
+  UseAreaChartProps,
+  UseAreaChartReturn,
+} from '../AreaChart.types';
 import { AREA_CHART_CONFIG } from '../base/BaseAreaChart.constants';
-import type { BaseAreaChartProps } from '../base/BaseAreaChart.types';
 import {
-  type AreaChartResolvedColors,
   createAreaChartData,
   createAreaChartOptions,
   resolveAreaChartColors,
 } from '../base/BaseAreaChart.utils';
-
-/* -------------------------------------------------------------------------- */
-/* Types                                                                       */
-/* -------------------------------------------------------------------------- */
-
-type UseAreaChartProps = Pick<
-  BaseAreaChartProps,
-  | 'data'
-  | 'labels'
-  | 'colors'
-  | 'options'
-  | 'appearance'
-  | 'effect'
-  | 'customStyles'
-  | 'rendererCustomStyles'
-  | 'className'
-  | 'testId'
->;
-
-type AreaChartWrapperProps = {
-  readonly className?: string;
-  readonly 'data-testid'?: string;
-  readonly 'data-appearance'?: string;
-  readonly 'data-effect'?: string;
-};
-
-type UseAreaChartReturn = {
-  readonly wrapperRef: RefObject<HTMLDivElement | null>;
-  readonly processedData: ChartJSData;
-  readonly areaOptions: ChartjsProps['options'] | undefined;
-  readonly plugins: NonNullable<ChartjsProps['plugins']>;
-  readonly wrapperProps: AreaChartWrapperProps;
-  readonly isReady: boolean;
-};
-
-/* -------------------------------------------------------------------------- */
-/* Hook                                                                        */
-/* -------------------------------------------------------------------------- */
 
 export const useAreaChart = ({
   data,
@@ -90,7 +54,11 @@ export const useAreaChart = ({
     setResolvedColors(resolveAreaChartColors(rootElement, colors));
   }, [rootElement, colors]);
 
-  const processedData = useMemo<ChartJSData>(() => {
+  /**
+   * Build the Chart.js AreaChart data after all colors
+   * have been resolved.
+   */
+  const processedData = useMemo<UseAreaChartReturn['processedData']>(() => {
     if (!resolvedColors || !rootElement) {
       return {
         labels: Array.from(labels),
@@ -107,7 +75,10 @@ export const useAreaChart = ({
     });
   }, [appearance, data, labels, resolvedColors, rootElement]);
 
-  const areaOptions = useMemo<ChartjsProps['options'] | undefined>(() => {
+  /**
+   * Build the Chart.js options using resolved semantic colors.
+   */
+  const areaOptions = useMemo<UseAreaChartReturn['areaOptions']>(() => {
     if (!resolvedColors) {
       return undefined;
     }
@@ -120,7 +91,10 @@ export const useAreaChart = ({
     );
   }, [options, resolvedColors]);
 
-  const plugins = useMemo<NonNullable<ChartjsProps['plugins']>>(
+  /**
+   * AreaChart-specific Chart.js plugins.
+   */
+  const plugins = useMemo<UseAreaChartReturn['plugins']>(
     () => [
       createPointHaloPlugin({
         enabled: true,
@@ -131,7 +105,11 @@ export const useAreaChart = ({
     [],
   );
 
-  const wrapperProps = useMemo<AreaChartWrapperProps>(
+  /**
+   * Wrapper attributes used by tests, styling,
+   * effects and appearance selectors.
+   */
+  const wrapperProps = useMemo<UseAreaChartReturn['wrapperProps']>(
     () =>
       compactObject({
         className,
@@ -142,7 +120,10 @@ export const useAreaChart = ({
     [appearance, className, effect, testId],
   );
 
-  const isReady = rootElement !== null && resolvedColors !== undefined && areaOptions !== undefined;
+  const isReady =
+    rootElement !== null &&
+    resolvedColors !== undefined &&
+    areaOptions !== undefined;
 
   return {
     wrapperRef,

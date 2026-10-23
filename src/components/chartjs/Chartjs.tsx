@@ -11,6 +11,8 @@ export const Chartjs = ({
   type,
   data,
   options,
+  ariaLable,
+  downloadText,
   plugins = [],
   showDownload = true,
   downloadPlacement = 'top-right',
@@ -45,12 +47,16 @@ export const Chartjs = ({
             <div
               tabIndex={0}
               role="button"
-              aria-label="Download chart"
+              aria-label={ariaLable || 'Download chart'}
               css={[styles.labelWrapper, customStyles.downloadLabel]}
             >
-              <Typography variant="span">Download</Typography>
+              <Typography variant="span">{downloadText || 'Download'}</Typography>
 
-              <Icon name="arrowDown" color="black" />
+              <Icon
+                name="arrowDown"
+                color="black"
+                customStyles={css([customStyles.downloadIcon])}
+              />
             </div>
           </PopOver>
         </div>

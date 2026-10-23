@@ -1,49 +1,132 @@
 import type { EChartsOption, LineSeriesOption } from 'echarts';
-
 import * as echarts from 'echarts';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
 
 import { getEChartsAlphaColor } from '@/components/echarts/utils/EChartsPointHalo.utils';
 
-import type { AreaChartDefinition, AreaChartResolvedSeries } from './base/BaseAreaChart.utils';
+import type {
+  EChartsDefinition,
+  EChartsSeriesDefinition,
+} from '../../ECharts.types';
 
 import { AREA_CHART_CONFIG } from './base/BaseAreaChart.constants';
 
 /**
+ * Resolved color configuration used by the AreaChart ECharts adapter.
+ */
+interface AreaChartColors {
+  readonly series: readonly string[];
+  readonly axisText: string;
+  readonly axisLine: string;
+  readonly grid: string;
+  readonly tooltipBackground: string;
+  readonly tooltipText: string;
+  readonly tooltipBorder: string;
+}
+
+/**
  * Creates the area fill gradient for a series.
  */
-const createAreaGradient = (color: string): echarts.graphic.LinearGradient =>
+const createAreaGradient = (
+  color: string,
+): echarts.graphic.LinearGradient =>
   new echarts.graphic.LinearGradient(0, 0, 0, 1, [
     {
       offset: 0,
-
-      color: getEChartsAlphaColor(color, AREA_CHART_CONFIG.gradientStartOpacity),
+      color: getEChartsAlphaColor(
+        color,
+        AREA_CHART_CONFIG.gradientStartOpacity,
+      ),
     },
-
     {
       offset: 1,
-
-      color: getEChartsAlphaColor(color, AREA_CHART_CONFIG.gradientEndOpacity),
+      color: getEChartsAlphaColor(
+        color,
+        AREA_CHART_CONFIG.gradientEndOpacity,
+      ),
     },
   ]);
 
 /**
+ * Resolves the line color for an AreaChart series.
+ */
+const getSeriesColor = (
+  item: EChartsSeriesDefinition,
+  index: number,
+  colors: AreaChartColors,
+): string =>
+  typeof item.color === 'string'
+    ? item.color
+    : colors.series[index % colors.series.length]!;
+
+/**
+ * Resolves the point color for an AreaChart series.
+ */
+const getPointColor = (
+  item: EChartsSeriesDefinition,
+  lineColor: string,
+): string => {
+  const pointColor = item['pointColor'];
+
+  return typeof pointColor === 'string'
+    ? pointColor
+    : lineColor;
+};
+
+/**
+ * Resolves an optional numeric series property.
+ */
+const getSeriesNumber = (
+  item: EChartsSeriesDefinition,
+  property: 'borderWidth' | 'pointRadius',
+): number | undefined => {
+  const value = item[property];
+
+  return typeof value === 'number'
+    ? value
+    : undefined;
+};
+
+/**
  * Creates one ECharts line series used by the AreaChart.
  */
-const createSeries = (
-  item: AreaChartResolvedSeries,
-  index: number,
-  appearance: AreaChartDefinition['appearance'],
-): LineSeriesOption => {
-  const color = item.color;
+const createSeries = ({
+  item,
+  index,
+  appearance,
+  colors,
+}: {
+  readonly item: EChartsSeriesDefinition;
+  readonly index: number;
+  readonly appearance: unknown;
+  readonly colors: AreaChartColors;
+}): LineSeriesOption => {
+  const color = getSeriesColor(
+    item,
+    index,
+    colors,
+  );
 
-  const pointColor = item.pointColor;
+  const pointColor = getPointColor(
+    item,
+    color,
+  );
+
+  const pointRadius = getSeriesNumber(
+    item,
+    'pointRadius',
+  );
+
+  const borderWidth = getSeriesNumber(
+    item,
+    'borderWidth',
+  );
 
   return compactObject({
     id: `area-series-${index}`,
 
-    name: item.label,
+    name: item.label ?? item.name,
 
     type: 'line',
 
@@ -57,13 +140,17 @@ const createSeries = (
 
     symbol: 'circle',
 
-    symbolSize: item.pointRadius ?? AREA_CHART_CONFIG.pointRadius,
+    symbolSize:
+      pointRadius ??
+      AREA_CHART_CONFIG.pointRadius,
 
     animation: true,
 
-    animationDuration: AREA_CHART_CONFIG.animationDuration,
+    animationDuration:
+      AREA_CHART_CONFIG.animationDuration,
 
-    animationDurationUpdate: AREA_CHART_CONFIG.animationDuration,
+    animationDurationUpdate:
+      AREA_CHART_CONFIG.animationDuration,
 
     animationEasing: 'cubicOut',
 
@@ -80,14 +167,19 @@ const createSeries = (
     emphasis: {
       focus: 'none',
 
-      scale: AREA_CHART_CONFIG.pointHoverScale,
+      scale:
+        AREA_CHART_CONFIG.pointHoverScale,
 
       itemStyle: {
         color: pointColor,
 
-        borderColor: getEChartsAlphaColor(pointColor, AREA_CHART_CONFIG.haloOpacity),
+        borderColor: getEChartsAlphaColor(
+          pointColor,
+          AREA_CHART_CONFIG.haloOpacity,
+        ),
 
-        borderWidth: AREA_CHART_CONFIG.haloRadius,
+        borderWidth:
+          AREA_CHART_CONFIG.haloRadius,
 
         borderType: 'solid',
       },
@@ -108,7 +200,9 @@ const createSeries = (
     },
 
     lineStyle: {
-      width: item.borderWidth ?? AREA_CHART_CONFIG.lineWidth,
+      width:
+        borderWidth ??
+        AREA_CHART_CONFIG.lineWidth,
 
       color,
     },
@@ -122,23 +216,43 @@ const createSeries = (
 /**
  * Creates the final ECharts option configuration for AreaChart.
  *
- * All colors have already been resolved before reaching this layer.
+ * The common ECharts dispatcher passes the generic ECharts definition to
+ * this adapter. AreaChart-specific properties are resolved at this boundary.
  */
-export const getAreaConfig = (definition: AreaChartDefinition): EChartsOption => {
-  const { labels, series, appearance, areaChartColors: colors } = definition;
+export const getAreaConfig = (
+  definition: EChartsDefinition,
+): EChartsOption => {
+  const colors =
+    definition['areaChartColors'] as
+    | AreaChartColors
+    | undefined;
 
-  if (colors.series.length === 0) {
+  if (
+    !colors ||
+    colors.series.length === 0
+  ) {
     return {};
   }
+
+  const appearance =
+    definition['appearance'];
+
+  const labels =
+    definition.labels ?? [];
+
+  const series =
+    definition.series ?? [];
 
   return {
     animation: true,
 
     animationThreshold: 10000,
 
-    animationDuration: AREA_CHART_CONFIG.animationDuration,
+    animationDuration:
+      AREA_CHART_CONFIG.animationDuration,
 
-    animationDurationUpdate: AREA_CHART_CONFIG.animationDuration,
+    animationDurationUpdate:
+      AREA_CHART_CONFIG.animationDuration,
 
     animationEasing: 'cubicOut',
 
@@ -147,9 +261,11 @@ export const getAreaConfig = (definition: AreaChartDefinition): EChartsOption =>
     tooltip: {
       trigger: 'item',
 
-      backgroundColor: colors.tooltipBackground,
+      backgroundColor:
+        colors.tooltipBackground,
 
-      borderColor: colors.tooltipBorder,
+      borderColor:
+        colors.tooltipBorder,
 
       textStyle: {
         color: colors.tooltipText,
@@ -163,15 +279,19 @@ export const getAreaConfig = (definition: AreaChartDefinition): EChartsOption =>
     legend: {
       show: true,
 
-      top: AREA_CHART_CONFIG.legend.top,
+      top:
+        AREA_CHART_CONFIG.legend.top,
 
       left: 'center',
 
-      itemWidth: AREA_CHART_CONFIG.legend.itemWidth,
+      itemWidth:
+        AREA_CHART_CONFIG.legend.itemWidth,
 
-      itemHeight: AREA_CHART_CONFIG.legend.itemHeight,
+      itemHeight:
+        AREA_CHART_CONFIG.legend.itemHeight,
 
-      itemGap: AREA_CHART_CONFIG.legend.itemGap,
+      itemGap:
+        AREA_CHART_CONFIG.legend.itemGap,
 
       icon: 'circle',
 
@@ -181,13 +301,17 @@ export const getAreaConfig = (definition: AreaChartDefinition): EChartsOption =>
     },
 
     grid: {
-      left: AREA_CHART_CONFIG.grid.left,
+      left:
+        AREA_CHART_CONFIG.grid.left,
 
-      right: AREA_CHART_CONFIG.grid.right,
+      right:
+        AREA_CHART_CONFIG.grid.right,
 
-      top: AREA_CHART_CONFIG.grid.top,
+      top:
+        AREA_CHART_CONFIG.grid.top,
 
-      bottom: AREA_CHART_CONFIG.grid.bottom,
+      bottom:
+        AREA_CHART_CONFIG.grid.bottom,
 
       containLabel: true,
     },
@@ -268,6 +392,14 @@ export const getAreaConfig = (definition: AreaChartDefinition): EChartsOption =>
       },
     },
 
-    series: series.map((item, index) => createSeries(item, index, appearance)),
+    series: series.map(
+      (item, index) =>
+        createSeries({
+          item,
+          index,
+          appearance,
+          colors,
+        }),
+    ),
   };
 };

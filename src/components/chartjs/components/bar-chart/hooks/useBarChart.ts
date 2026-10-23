@@ -1,62 +1,29 @@
-import { type RefObject, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
 
-import type { ChartJSData, ChartjsProps } from '@/components/chartjs/ChartJS.types';
-
-import type { BaseBarChartProps } from '../base/BaseBarChart.types';
+import type {
+  BarChartResolvedColors,
+  UseBarChartProps,
+  UseBarChartReturn,
+} from '../BarChart.types';
 import {
-  type BarChartResolvedColors,
   createBarChartData,
   createBarChartOptions,
   resolveBarChartColors,
 } from '../base/BaseBarChart.utils';
-
-/* -------------------------------------------------------------------------- */
-/* Types                                                                       */
-/* -------------------------------------------------------------------------- */
-
-type UseBarChartProps = Pick<
-  BaseBarChartProps,
-  | 'data'
-  | 'labels'
-  | 'colors'
-  | 'options'
-  | 'effect'
-  | 'customStyles'
-  | 'rendererCustomStyles'
-  | 'className'
-  | 'testId'
->;
-
-type BarChartWrapperProps = {
-  readonly className?: string;
-  readonly 'data-testid'?: string;
-  readonly 'data-effect'?: string;
-};
-
-type UseBarChartReturn = {
-  readonly wrapperRef: RefObject<HTMLDivElement | null>;
-
-  readonly processedData: ChartJSData;
-
-  readonly barOptions: ChartjsProps['options'] | undefined;
-
-  readonly wrapperProps: BarChartWrapperProps;
-
-  readonly isReady: boolean;
-};
-
-/* -------------------------------------------------------------------------- */
-/* Hook                                                                        */
-/* -------------------------------------------------------------------------- */
 
 export const useBarChart = ({
   data,
   labels,
   colors,
   options,
-  effect = 'none',
+  effect,
   customStyles,
   rendererCustomStyles,
   className,
@@ -64,39 +31,50 @@ export const useBarChart = ({
 }: UseBarChartProps): UseBarChartReturn => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
+  const [rootElement, setRootElement] =
+    useState<HTMLDivElement | null>(null);
 
-  const [resolvedColors, setResolvedColors] = useState<BarChartResolvedColors>();
+  const [resolvedColors, setResolvedColors] =
+    useState<BarChartResolvedColors>();
 
   /**
-   * Capture the rendered wrapper so graph CSS
-   * variables can be resolved from computed styles.
+   * Capture the chart wrapper after mount so Canvas colors
+   * can be resolved from computed CSS custom properties.
    */
   useLayoutEffect(() => {
     setRootElement(wrapperRef.current);
-  }, [customStyles?.wrapper, rendererCustomStyles?.container]);
+  }, [
+    customStyles?.wrapper,
+    rendererCustomStyles?.container,
+  ]);
 
   /**
-   * Resolve root graph tokens and consumer
-   * chart-level color overrides.
+   * Resolve CSS variables and consumer overrides
+   * before passing color values to the Canvas API.
    */
   useLayoutEffect(() => {
     if (!rootElement) {
       return;
     }
 
-    setResolvedColors(resolveBarChartColors(rootElement, colors));
+    setResolvedColors(
+      resolveBarChartColors(
+        rootElement,
+        colors,
+      ),
+    );
   }, [rootElement, colors]);
 
   /**
-   * Build Chart.js datasets after all CSS variables
-   * have been converted to real color values.
+   * Build the Chart.js BarChart data after all colors
+   * have been resolved.
    */
-  const processedData = useMemo<ChartJSData>(() => {
-    if (!rootElement || !resolvedColors) {
+  const processedData = useMemo<
+    UseBarChartReturn['processedData']
+  >(() => {
+    if (!resolvedColors || !rootElement) {
       return {
         labels: Array.from(labels),
-
         datasets: [],
       };
     }
@@ -110,13 +88,20 @@ export const useBarChart = ({
         options,
       }),
     );
-  }, [data, labels, options, resolvedColors, rootElement]);
+  }, [
+    data,
+    labels,
+    options,
+    resolvedColors,
+    rootElement,
+  ]);
 
   /**
-   * Build Chart.js options using the resolved
-   * semantic graph colors.
+   * Build the Chart.js options using resolved semantic colors.
    */
-  const barOptions = useMemo<ChartjsProps['options'] | undefined>(() => {
+  const barOptions = useMemo<
+    UseBarChartReturn['barOptions']
+  >(() => {
     if (!resolvedColors) {
       return undefined;
     }
@@ -127,21 +112,35 @@ export const useBarChart = ({
         colors: resolvedColors,
       }),
     );
-  }, [options, resolvedColors]);
+  }, [
+    options,
+    resolvedColors,
+  ]);
 
-  const wrapperProps = useMemo<BarChartWrapperProps>(
+  /**
+   * Wrapper attributes used by tests,
+   * styling and effects.
+   */
+  const wrapperProps = useMemo<
+    UseBarChartReturn['wrapperProps']
+  >(
     () =>
       compactObject({
         className,
-
         'data-testid': testId,
-
         'data-effect': effect,
       }),
-    [className, effect, testId],
+    [
+      className,
+      effect,
+      testId,
+    ],
   );
 
-  const isReady = rootElement !== null && resolvedColors !== undefined && barOptions !== undefined;
+  const isReady =
+    rootElement !== null &&
+    resolvedColors !== undefined &&
+    barOptions !== undefined;
 
   return {
     wrapperRef,

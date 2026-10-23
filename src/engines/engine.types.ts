@@ -89,6 +89,8 @@ export type ChartCustomStyles = {
   readonly downloadLabel?: StyleType;
 
   readonly downloadMenu?: StyleType;
+
+  readonly downloadIcon?: StyleType;
 };
 
 export type ChartOptions = {
