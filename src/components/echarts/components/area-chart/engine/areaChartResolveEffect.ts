@@ -1,4 +1,5 @@
-import type { EChartsEffectStyleModule } from '../../../common-effects/EChartsEffect.types';
+import type { EChartsEffectStyleModule } from '@/components/echarts/common-effects';
+
 import type { AreaChartEffect } from '../AreaChart.types';
 
 import { getComponent } from './__registry__';

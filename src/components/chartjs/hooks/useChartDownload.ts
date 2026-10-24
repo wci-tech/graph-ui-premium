@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { type RefObject, useCallback } from 'react';
 
 import type { DownloadFormat } from '../ChartJS.types';
 import { CHART_JS_EXPORT_FILE_NAME } from '../utils/ChartJS.constants';
@@ -9,8 +9,16 @@ const IMAGE_MIME_TYPES = {
   jpg: 'image/jpeg',
 } as const;
 
+const createDownloadUrl = (
+  canvas: HTMLCanvasElement,
+  format: DownloadFormat,
+): string =>
+  format === 'svg'
+    ? createSvgDownloadUrl(canvas)
+    : canvas.toDataURL(IMAGE_MIME_TYPES[format]);
+
 export const useChartDownload = (
-  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+  canvasRef: RefObject<HTMLCanvasElement | null>,
 ) => {
   const handleDownload = useCallback(
     (format: DownloadFormat) => {
@@ -20,25 +28,18 @@ export const useChartDownload = (
         return;
       }
 
+      const downloadUrl = createDownloadUrl(canvas, format);
+
       const link = document.createElement('a');
 
-      if (format === 'svg') {
-        const objectUrl = createSvgDownloadUrl(canvas);
-
-        link.href = objectUrl;
-        link.download = `${CHART_JS_EXPORT_FILE_NAME}.svg`;
-        link.click();
-
-        URL.revokeObjectURL(objectUrl);
-
-        return;
-      }
-
-      const mimeType = IMAGE_MIME_TYPES[format];
-
-      link.href = canvas.toDataURL(mimeType);
+      link.href = downloadUrl;
       link.download = `${CHART_JS_EXPORT_FILE_NAME}.${format}`;
+
       link.click();
+
+      if (format === 'svg') {
+        URL.revokeObjectURL(downloadUrl);
+      }
     },
     [canvasRef],
   );

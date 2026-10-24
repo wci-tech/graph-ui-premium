@@ -1,89 +1,44 @@
 /** @jsxImportSource @emotion/react */
+
 import { useMemo } from 'react';
 
 import { css } from '@emotion/react';
-import { compactObject, useTheme } from '@wci-tech/core-ui';
 
-import type { BarChartCustomStyles, BarChartProps } from '../BarChart.types';
+import type { BarChartCustomStyles, BarChartOptions, BarChartProps } from '../BarChart.types';
 import BaseBarChart from '../base/BaseBarChart';
 
-import type { BarChartStateResolution } from './BarChartEngine.types';
 import { resolveBarChartEffect } from './barChartResolveEffect';
-import { resolveBarChartVariant } from './barChartResolveVariant';
 
 export const BarChartEngine = (props: BarChartProps) => {
-  const {
-    variant = 'primary',
-    effect = 'none',
-    options,
+  const { effect = 'none', options, customStyles, ...rest } = props;
 
-    customStyles,
-    rendererCustomStyles,
-
-    showDownload,
-    downloadPlacement,
-
-    ...rest
-  } = props;
-
-  const { theme } = useTheme();
-
-  const resolution: BarChartStateResolution = useMemo(
-    () =>
-      compactObject({
-        theme,
-        variant,
-        effect,
-      }),
-    [theme, variant, effect],
-  );
-
-  const variantConfig = resolveBarChartVariant(variant, resolution);
   const effectConfig = resolveBarChartEffect(effect);
 
-  const mergedStyles = useMemo((): BarChartCustomStyles => {
-    return compactObject({
-      wrapper: css([
-        variantConfig?.customStyles?.wrapper,
-        effectConfig?.customStyles?.wrapper,
-        customStyles?.wrapper,
-      ]),
+  const mergedStyles = useMemo<BarChartCustomStyles>(
+    () => ({
+      wrapper: css([effectConfig?.customStyles?.wrapper, customStyles?.wrapper]),
 
-      chart: css([
-        variantConfig?.customStyles?.chart,
-        effectConfig?.customStyles?.chart,
-        customStyles?.chart,
-      ]),
-    });
-  }, [variantConfig, effectConfig, customStyles]);
-
-  const mergedOptions = useMemo(
-    () =>
-      compactObject({
-        ...variantConfig?.options,
-        ...effectConfig?.options,
-        ...options,
-      }),
-    [variantConfig?.options, effectConfig?.options, options],
+      chart: css([effectConfig?.customStyles?.chart, customStyles?.chart]),
+    }),
+    [
+      effectConfig?.customStyles?.wrapper,
+      effectConfig?.customStyles?.chart,
+      customStyles?.wrapper,
+      customStyles?.chart,
+    ],
   );
 
-  const baseBarChartProps = compactObject({
-    ...rest,
+  const mergedOptions = useMemo<BarChartOptions>(
+    () => ({
+      ...effectConfig?.options,
+      ...options,
+    }),
+    [effectConfig?.options, options],
+  );
 
-    variant,
-    effect,
-
-    options: mergedOptions,
-
-    customStyles: mergedStyles,
-
-    rendererCustomStyles,
-
-    showDownload,
-    downloadPlacement,
-  });
-
-  return <BaseBarChart {...baseBarChartProps} />;
+  return (
+    <BaseBarChart {...rest} effect={effect} options={mergedOptions} customStyles={mergedStyles} />
+  );
 };
 
 export default BarChartEngine;

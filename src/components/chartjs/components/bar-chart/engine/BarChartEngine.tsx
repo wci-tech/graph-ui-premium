@@ -14,16 +14,12 @@ export const BarChartEngine = (props: BarChartProps) => {
   const {
     effect = 'none',
     options,
-
     customStyles,
     rendererCustomStyles,
-
     showDownload,
     downloadPlacement,
-
     className,
     testId,
-
     ...rest
   } = props;
 
@@ -32,7 +28,6 @@ export const BarChartEngine = (props: BarChartProps) => {
   const mergedStyles = useMemo(
     (): BarChartCustomStyles => ({
       wrapper: css([effectConfig?.customStyles?.wrapper, customStyles?.wrapper]),
-
       chart: css([effectConfig?.customStyles?.chart, customStyles?.chart]),
     }),
     [effectConfig, customStyles],
@@ -41,12 +36,9 @@ export const BarChartEngine = (props: BarChartProps) => {
   const mergedOptions = useMemo<BarChartOptions>(
     () => ({
       ...options,
-
       ...effectConfig?.options,
-
       animation: {
         ...options?.animation,
-
         ...effectConfig?.options?.animation,
       },
     }),
@@ -55,18 +47,12 @@ export const BarChartEngine = (props: BarChartProps) => {
 
   const baseBarChartProps = compactObject({
     ...rest,
-
     effect,
-
     options: mergedOptions,
-
     customStyles: mergedStyles,
-
     rendererCustomStyles,
-
     showDownload,
     downloadPlacement,
-
     className,
     testId,
   });

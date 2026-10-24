@@ -1,36 +1,23 @@
 import type { ComponentType } from 'react';
 
-import type { ITheme, StyleModule } from '@wci-tech/core-ui';
+import type { EChartsOption } from 'echarts';
 
-import type { EChartsEffectStyleModule } from '../../../common-effects/EChartsEffect.types';
+import type { EChartsEffectStyleModule } from '@/components/echarts/common-effects';
+
 import type {
   BarChartCustomStyles,
   BarChartEffect,
   BarChartProps,
-  BarChartVariant,
 } from '../BarChart.types';
 
-export type BarChartRegistryKey = BarChartVariant | Exclude<BarChartEffect, 'none'>;
+export type BarChartRegistryKey =
+  Exclude<BarChartEffect, 'none'>;
 
 export type BarChartResolvedConfig = {
   readonly customStyles?: BarChartCustomStyles;
-
-  readonly colors?: string[];
-
-  readonly options?: Record<string, unknown>;
+  readonly options?: EChartsOption;
 };
 
-export type BarChartStateResolution = Readonly<{
-  theme: ITheme;
-
-  variant: BarChartVariant;
-
-  effect?: BarChartEffect;
-}>;
-
-export type BarChartStyleModule = StyleModule<BarChartStateResolution, BarChartResolvedConfig>;
-
 export type BarChartRegistryEntry =
-  | BarChartStyleModule
   | EChartsEffectStyleModule
   | ComponentType<BarChartProps>;

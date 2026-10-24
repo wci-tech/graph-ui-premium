@@ -1,6 +1,8 @@
 import type { EChartsOption, TooltipComponentOption } from 'echarts';
 import type { AxisPointerOption } from 'echarts/types/dist/shared';
 
+import { CHART_COLOR_VARIABLES, CHART_TOKEN_VARIABLES } from '@/common/constants/Chart.colors';
+
 import type {
   AreaChartAppearance,
   AreaChartColors,
@@ -8,8 +10,6 @@ import type {
   AreaChartOptions,
   AreaChartSeries,
 } from '../AreaChart.types';
-
-import { AREA_CHART_COLOR_VARIABLES, AREA_CHART_TOKEN_VARIABLES } from './BaseAreaChart.constants';
 
 export interface AreaChartResolvedColors {
   readonly series: readonly string[];
@@ -109,7 +109,7 @@ const resolveColor = (styles: CSSStyleDeclaration, color: string): string => {
 };
 
 const resolveDefaultSeriesColors = (styles: CSSStyleDeclaration): readonly string[] =>
-  AREA_CHART_COLOR_VARIABLES.map((variableName) =>
+  CHART_COLOR_VARIABLES.map((variableName) =>
     resolveColor(styles, resolveCssVariable(styles, variableName)),
   );
 
@@ -129,27 +129,27 @@ export const resolveAreaChartColors = (
 
     axisText: colors?.axisText
       ? resolveColor(styles, colors.axisText)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.axisText),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.axisText),
 
     axisLine: colors?.axisLine
       ? resolveColor(styles, colors.axisLine)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.axisLine),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.axisLine),
 
     grid: colors?.grid
       ? resolveColor(styles, colors.grid)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.grid),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.grid),
 
     tooltipBackground: colors?.tooltipBackground
       ? resolveColor(styles, colors.tooltipBackground)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipBackground),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBackground),
 
     tooltipText: colors?.tooltipText
       ? resolveColor(styles, colors.tooltipText)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipText),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipText),
 
     tooltipBorder: colors?.tooltipBorder
       ? resolveColor(styles, colors.tooltipBorder)
-      : resolveCssVariable(styles, AREA_CHART_TOKEN_VARIABLES.tooltipBorder),
+      : resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBorder),
   };
 };
 
@@ -272,8 +272,8 @@ export const mergeAreaChartOptions = (
 
       ...(showLegend !== undefined
         ? {
-            show: showLegend,
-          }
+          show: showLegend,
+        }
         : {}),
 
       ...asRecord(legend),
@@ -287,9 +287,9 @@ export const mergeAreaChartOptions = (
       trigger: crosshair
         ? 'axis'
         : resolveTooltipTrigger(
-            customTooltip.trigger,
-            resolveTooltipTrigger(generatedTooltip.trigger, 'item'),
-          ),
+          customTooltip.trigger,
+          resolveTooltipTrigger(generatedTooltip.trigger, 'item'),
+        ),
 
       axisPointer: {
         ...generatedPointer,
@@ -301,9 +301,9 @@ export const mergeAreaChartOptions = (
         type: crosshair
           ? 'cross'
           : resolveAxisPointerType(
-              customPointer.type,
-              resolveAxisPointerType(generatedPointer.type, 'line'),
-            ),
+            customPointer.type,
+            resolveAxisPointerType(generatedPointer.type, 'line'),
+          ),
 
         snap: true,
       },

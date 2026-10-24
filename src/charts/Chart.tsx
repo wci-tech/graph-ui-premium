@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { compactObject, useIntersectionObserver } from '@wci-tech/core-ui-premium';
 
+import { ChartLoader } from '@/common/components/chart-loader';
 import type { EngineRendererProps } from '@/engines/engine.types';
 
 import { useChart } from './hooks/useChart';
@@ -24,13 +25,13 @@ export const Chart = (props: ChartProps) => {
   /*
    * Normal charts begin enabled immediately.
    *
-   * renderWhenVisible charts begin disabled and are enabled
-   * permanently after entering the viewport for the first time.
+   * Lazy-loaded charts begin disabled and are enabled permanently
+   * after entering the viewport for the first time.
    */
   const [hasBeenVisible, setHasBeenVisible] = useState(!lazyLoadOnVisible);
 
   /*
-   * Keep using the existing core-ui hook.
+   * Observe the chart container only until it becomes visible.
    *
    * Once hasBeenVisible becomes true, observation is no longer needed.
    */
@@ -42,10 +43,10 @@ export const Chart = (props: ChartProps) => {
   });
 
   /*
-   * Latch visibility.
+   * Latch the visible state.
    *
-   * We intentionally do not use isInView directly for rendering,
-   * because after the chart has been activated it should remain mounted.
+   * The chart remains mounted after its first viewport entry,
+   * even if it later leaves the viewport.
    */
   useEffect(() => {
     if (!isInView || hasBeenVisible) {
@@ -58,11 +59,10 @@ export const Chart = (props: ChartProps) => {
   const shouldRender = !lazyLoadOnVisible || hasBeenVisible;
 
   /*
-   * Engine loading is also deferred.
+   * Engine loading is deferred until the chart is ready to render.
    *
-   * This is the important part:
-   * ChartJS / ECharts will not even be loaded for this Chart instance
-   * until its placeholder reaches the viewport.
+   * Chart.js or ECharts will not be loaded for this chart instance
+   * until lazy loading has been activated.
    */
   const { resolvedEngine, engineModule, isLoading } = useChart({
     engine,
@@ -70,6 +70,10 @@ export const Chart = (props: ChartProps) => {
     enabled: shouldRender,
   });
 
+  /*
+   * Render an unsupported-engine message when no registered engine
+   * can render the requested chart type.
+   */
   if (!resolvedEngine) {
     return (
       <div ref={ref} data-testid={testId} css={styles.root}>
@@ -81,22 +85,22 @@ export const Chart = (props: ChartProps) => {
   }
 
   /*
-   * Before viewport entry, render only the correctly-sized root.
+   * Before viewport entry, render only the correctly-sized container.
    *
-   * This preserves layout while preventing the real chart renderer
-   * and its entrance animation from starting early.
+   * This preserves the page layout without loading the chart engine.
    */
   if (!shouldRender) {
     return <div ref={ref} data-testid={testId} css={styles.root} />;
   }
 
   /*
-   * Once visible, useChart begins loading the engine.
+   * Display the shared block-level ChartLoader while the selected
+   * chart engine is being loaded.
    */
   if (isLoading || !engineModule) {
     return (
       <div ref={ref} data-testid={testId} css={styles.root}>
-        <div css={styles.message}>Loading chart...</div>
+        <ChartLoader />
       </div>
     );
   }
@@ -104,7 +108,7 @@ export const Chart = (props: ChartProps) => {
   const EngineRenderer = engineModule.EngineRenderer;
 
   /*
-   * renderWhenVisible belongs only to the shared Chart wrapper.
+   * lazyLoadOnVisible belongs only to the shared Chart wrapper.
    * Individual engine implementations do not need this prop.
    */
   const { lazyLoadOnVisible: _lazyLoadOnVisible, ...rendererProps } = props;

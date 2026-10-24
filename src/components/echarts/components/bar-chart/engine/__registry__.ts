@@ -1,45 +1,56 @@
 import { createRegistry } from '@/registry';
 
-import type { BarChartEffect, BarChartVariant } from '../BarChart.types';
-import PrimaryBarChartStyles from '../variants/PrimaryBarChart.styles';
+import type { BarChartEffect } from '../BarChart.types';
 
 import type {
   BarChartRegistryEntry,
   BarChartRegistryKey,
-  BarChartStyleModule,
 } from './BarChartEngine.types';
 
-const variantLoaders: Partial<Record<BarChartVariant, () => Promise<BarChartStyleModule>>> = {
-  secondary: () => import('../variants/SecondaryBarChart.styles').then((m) => m.default),
-};
-
 const effectLoaders: Partial<
-  Record<Exclude<BarChartEffect, 'none'>, () => Promise<BarChartRegistryEntry>>
+  Record<
+    Exclude<BarChartEffect, 'none'>,
+    () => Promise<BarChartRegistryEntry>
+  >
 > = {
-  bounce: () => import('../../../common-effects/BounceEChartsEffect.styles').then((m) => m.default),
+  bounce: () =>
+    import(
+      '@/components/echarts/common-effects/BounceEChartsEffect.styles'
+    ).then((module) => module.default),
 
-  wobble: () => import('../../../common-effects/WobbleEChartsEffect.styles').then((m) => m.default),
+  wobble: () =>
+    import(
+      '@/components/echarts/common-effects/WobbleEChartsEffect.styles'
+    ).then((module) => module.default),
 
   elastic: () =>
-    import('../../../common-effects/ElasticEChartsEffect.styles').then((m) => m.default),
+    import(
+      '@/components/echarts/common-effects/ElasticEChartsEffect.styles'
+    ).then((module) => module.default),
 
   'progressive-trace': () =>
-    import('../../../common-effects/ProgressiveTraceEChartsEffect.styles').then((m) => m.default),
+    import(
+      '@/components/echarts/common-effects/ProgressiveTraceEChartsEffect.styles'
+    ).then((module) => module.default),
 
   'elastic-glide': () =>
-    import('../../../common-effects/ElasticGlideEChartsEffect.styles').then((m) => m.default),
+    import(
+      '@/components/echarts/common-effects/ElasticGlideEChartsEffect.styles'
+    ).then((module) => module.default),
 
   'staggered-reveal': () =>
-    import('../../../common-effects/StaggeredRevealEChartsEffect.styles').then((m) => m.default),
+    import(
+      '@/components/echarts/common-effects/StaggeredRevealEChartsEffect.styles'
+    ).then((module) => module.default),
 };
 
-export const getComponent = createRegistry<BarChartRegistryKey, BarChartRegistryEntry>({
-  eager: {
-    primary: PrimaryBarChartStyles,
-  },
+export const getComponent = createRegistry<
+  BarChartRegistryKey,
+  BarChartRegistryEntry
+>({
+  eager: {},
 
   lazy: {
-    ...variantLoaders,
     ...effectLoaders,
   },
 });

@@ -1,4 +1,5 @@
-import type { ChartJSEffectStyleModule } from '../../../common-effects';
+import type { ChartJSEffectStyleModule } from '@/components/chartjs/common-effects';
+
 import type { AreaChartEffect } from '../AreaChart.types';
 
 import { getComponent } from './__registry__';

@@ -1,284 +1,358 @@
-import type { EChartsOption } from 'echarts';
-import type { AxisPointerOption, TooltipOption } from 'echarts/types/dist/shared';
+import type { EChartsOption, TooltipComponentOption } from 'echarts';
+import type { AxisPointerOption } from 'echarts/types/dist/shared';
+
+import {
+  CHART_COLOR_VARIABLES,
+  CHART_TOKEN_VARIABLES,
+} from '@/common/constants/Chart.colors';
+import { isRecord } from '@/common/utils/Common.utils';
 
 import type {
-  EChartsDefinition,
-  EChartsSeriesDefinition,
-} from '@/components/echarts/ECharts.types';
+  BarChartColors,
+  BarChartData,
+  BarChartOptions,
+  BarChartResolvedColors,
+  BarChartSeries,
+} from '../BarChart.types';
 
-import type { BarChartData, BarChartOptions } from '../BarChart.types';
 
-/* -------------------------------------------------------------------------- */
-/* Shared Bar Chart fallbacks                                                  */
-/*                                                                            */
-/* Keep these identical in ChartJS.                                            */
-/* -------------------------------------------------------------------------- */
 
-const FALLBACK_PRIMARY_BAR_COLOR = '#763d6c';
-const FALLBACK_SECONDARY_BAR_COLOR = '#316851';
-const FALLBACK_LABEL_COLOR = '#4b5563';
-const FALLBACK_AXIS_COLOR = '#d1d5db';
-const FALLBACK_GRID_COLOR = '#e5e7eb';
+export interface BarChartResolvedSeries extends BarChartSeries {
+  readonly color: string;
+}
 
-type TooltipTrigger = NonNullable<TooltipOption['trigger']>;
-type AxisPointerType = NonNullable<AxisPointerOption['type']>;
-type UnknownRecord = Record<string, unknown>;
+export interface BarChartDefinition {
+  readonly type: 'bar';
+  readonly labels: string[];
+  readonly series: BarChartResolvedSeries[];
+  readonly horizontal: boolean;
+  readonly barWidth: number;
+  readonly barChartColors: BarChartResolvedColors;
+}
 
-const isRecord = (value: unknown): value is UnknownRecord =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+type TooltipTrigger = 'item' | 'axis' | 'none';
+type AxisPointerType = 'line' | 'shadow' | 'none' | 'cross';
 
-const compactObject = <TObject extends UnknownRecord>(object: TObject): Partial<TObject> =>
-  Object.fromEntries(
-    Object.entries(object).filter(([, value]) => value !== undefined),
-  ) as Partial<TObject>;
+const CSS_VARIABLE_PATTERN = /^var\(\s*(--[^,\s)]+)\s*(?:,\s*(.+))?\)$/;
 
-const getRecordConfig = (value: unknown): UnknownRecord => (isRecord(value) ? value : {});
+const asRecord = (value: unknown): Record<string, unknown> =>
+  isRecord(value) ? value : {};
 
-const getTooltipConfig = (value: unknown): TooltipOption =>
-  isRecord(value) ? (value as TooltipOption) : {};
+const asTooltip = (value: unknown): TooltipComponentOption =>
+  isRecord(value) ? (value as TooltipComponentOption) : {};
 
-const getAxisPointerConfig = (value: unknown): AxisPointerOption =>
+const asAxisPointer = (value: unknown): AxisPointerOption =>
   isRecord(value) ? (value as AxisPointerOption) : {};
 
-const isTooltipTrigger = (value: unknown): value is TooltipTrigger =>
-  value === 'item' || value === 'axis' || value === 'none';
-
-const isAxisPointerType = (value: unknown): value is AxisPointerType =>
-  value === 'line' || value === 'shadow' || value === 'cross' || value === 'none';
-
-const resolveTooltipTrigger = ({
-  crosshairEnabled,
-  customTrigger,
-  generatedTrigger,
-}: {
-  readonly crosshairEnabled: boolean;
-  readonly customTrigger: unknown;
-  readonly generatedTrigger: unknown;
-}): TooltipTrigger => {
-  if (crosshairEnabled) {
-    return 'axis';
-  }
-
-  if (isTooltipTrigger(customTrigger)) {
-    return customTrigger;
-  }
-
-  if (isTooltipTrigger(generatedTrigger)) {
-    return generatedTrigger;
-  }
-
-  return 'item';
-};
-
-const resolveAxisPointerType = ({
-  crosshairEnabled,
-  customType,
-  generatedType,
-}: {
-  readonly crosshairEnabled: boolean;
-  readonly customType: unknown;
-  readonly generatedType: unknown;
-}): AxisPointerType => {
-  if (crosshairEnabled) {
-    return 'cross';
-  }
-
-  if (isAxisPointerType(customType)) {
-    return customType;
-  }
-
-  if (isAxisPointerType(generatedType)) {
-    return generatedType;
-  }
-
-  return 'line';
-};
-
-const getCssVariable = (
-  element: HTMLElement | null,
+const resolveCssVariable = (
+  styles: CSSStyleDeclaration,
   variableName: string,
-  fallback: string,
 ): string => {
-  if (!element) {
-    return fallback;
+  const value = styles.getPropertyValue(variableName).trim();
+
+  if (!value) {
+    throw new Error(
+      `[BarChart] Missing required CSS variable "${variableName}".`,
+    );
   }
 
-  const value = getComputedStyle(element).getPropertyValue(variableName).trim();
-
-  return value || fallback;
+  return value;
 };
 
-const getBarChartSeries = (
-  data: BarChartData | undefined,
-  series: EChartsSeriesDefinition[] | undefined,
-): EChartsSeriesDefinition[] => data?.series ?? data?.datasets ?? series ?? [];
+const resolveColor = (
+  styles: CSSStyleDeclaration,
+  color: string,
+): string => {
+  const normalizedColor = color.trim();
+  const match = normalizedColor.match(CSS_VARIABLE_PATTERN);
 
-/* -------------------------------------------------------------------------- */
-/* Shared CSS-variable contract                                                */
-/* -------------------------------------------------------------------------- */
+  if (!match) {
+    return normalizedColor;
+  }
 
-export const getResolvedBarChartColors = (element: HTMLElement | null) => ({
-  barColors: [
-    getCssVariable(element, '--bar-chart-bar-color', FALLBACK_PRIMARY_BAR_COLOR),
+  const variableName = match[1];
 
-    getCssVariable(element, '--bar-chart-secondary-bar-color', FALLBACK_SECONDARY_BAR_COLOR),
-  ],
+  if (!variableName) {
+    return normalizedColor;
+  }
 
-  labelColor: getCssVariable(element, '--bar-chart-label-color', FALLBACK_LABEL_COLOR),
+  const resolvedColor = styles.getPropertyValue(variableName).trim();
 
-  axisColor: getCssVariable(element, '--bar-chart-axis-color', FALLBACK_AXIS_COLOR),
+  if (resolvedColor) {
+    return resolveColor(styles, resolvedColor);
+  }
 
-  gridColor: getCssVariable(element, '--bar-chart-grid-color', FALLBACK_GRID_COLOR),
-});
+  const fallback = match[2]?.trim();
 
-/* -------------------------------------------------------------------------- */
-/* Definition                                                                  */
-/* -------------------------------------------------------------------------- */
+  if (fallback) {
+    return resolveColor(styles, fallback);
+  }
+
+  throw new Error(
+    `[BarChart] Unable to resolve CSS color variable "${variableName}".`,
+  );
+};
+
+const resolveDefaultSeriesColors = (
+  styles: CSSStyleDeclaration,
+): readonly string[] =>
+  CHART_COLOR_VARIABLES.map((variableName) =>
+    resolveColor(
+      styles,
+      resolveCssVariable(styles, variableName),
+    ),
+  );
+
+const resolveTokenColor = (
+  styles: CSSStyleDeclaration,
+  color: string | undefined,
+  variableName: string,
+): string =>
+  color
+    ? resolveColor(styles, color)
+    : resolveColor(
+      styles,
+      resolveCssVariable(styles, variableName),
+    );
+
+export const resolveBarChartColors = (
+  element: HTMLElement,
+  colors?: BarChartColors,
+): BarChartResolvedColors => {
+  const styles = getComputedStyle(element);
+
+  const series =
+    colors?.series?.length
+      ? colors.series.map((color) =>
+        resolveColor(styles, color),
+      )
+      : resolveDefaultSeriesColors(styles);
+
+  return {
+    series,
+    axisText: resolveTokenColor(
+      styles,
+      colors?.axisText,
+      CHART_TOKEN_VARIABLES.axisText,
+    ),
+    axisLine: resolveTokenColor(
+      styles,
+      colors?.axisLine,
+      CHART_TOKEN_VARIABLES.axisLine,
+    ),
+    grid: resolveTokenColor(
+      styles,
+      colors?.grid,
+      CHART_TOKEN_VARIABLES.grid,
+    ),
+    tooltipBackground: resolveTokenColor(
+      styles,
+      colors?.tooltipBackground,
+      CHART_TOKEN_VARIABLES.tooltipBackground,
+    ),
+    tooltipText: resolveTokenColor(
+      styles,
+      colors?.tooltipText,
+      CHART_TOKEN_VARIABLES.tooltipText,
+    ),
+    tooltipBorder: resolveTokenColor(
+      styles,
+      colors?.tooltipBorder,
+      CHART_TOKEN_VARIABLES.tooltipBorder,
+    ),
+  };
+};
+
+const getSeriesColor = (
+  item: BarChartSeries,
+  index: number,
+  colors: BarChartResolvedColors,
+  styles: CSSStyleDeclaration,
+): string => {
+  if (item.color) {
+    return resolveColor(styles, item.color);
+  }
+
+  const color = colors.series[index % colors.series.length];
+
+  if (!color) {
+    throw new Error(
+      '[BarChart] At least one series color is required.',
+    );
+  }
+
+  return color;
+};
+
+const resolveSeries = (
+  element: HTMLElement,
+  series: readonly BarChartSeries[],
+  colors: BarChartResolvedColors,
+): BarChartResolvedSeries[] => {
+  const styles = getComputedStyle(element);
+
+  return series.map((item, index) => ({
+    ...item,
+    color: getSeriesColor(
+      item,
+      index,
+      colors,
+      styles,
+    ),
+  }));
+};
 
 export const createBarChartDefinition = ({
+  element,
   data,
-  labels,
-  series,
   colors,
   horizontal,
   barWidth,
 }: {
-  readonly data?: BarChartData;
-  readonly labels?: string[];
-  readonly series?: EChartsSeriesDefinition[];
-  readonly colors: ReturnType<typeof getResolvedBarChartColors>;
+  readonly element: HTMLElement;
+  readonly data: BarChartData;
+  readonly colors: BarChartResolvedColors;
   readonly horizontal: boolean;
   readonly barWidth: number;
-}): EChartsDefinition => {
-  const resolvedSeries = getBarChartSeries(data, series);
+}): BarChartDefinition => ({
+  type: 'bar',
+  labels: [...data.labels],
+  series: resolveSeries(
+    element,
+    data.series,
+    colors,
+  ),
+  horizontal,
+  barWidth,
+  barChartColors: colors,
+});
 
-  return {
-    type: 'bar',
+const resolveTooltipTrigger = (
+  value: unknown,
+  fallback: TooltipTrigger,
+): TooltipTrigger =>
+  value === 'item' ||
+    value === 'axis' ||
+    value === 'none'
+    ? value
+    : fallback;
 
-    labels: data?.labels ?? labels ?? [],
+const resolveAxisPointerType = (
+  value: unknown,
+  fallback: AxisPointerType,
+): AxisPointerType =>
+  value === 'line' ||
+    value === 'shadow' ||
+    value === 'none' ||
+    value === 'cross'
+    ? value
+    : fallback;
 
-    horizontal,
-
-    barWidth,
-
-    barChartColors: colors,
-
-    series: resolvedSeries.map<EChartsSeriesDefinition>((item, index) => ({
-      ...item,
-
-      type: 'bar',
-
-      color:
-        item.color ?? colors.barColors[index] ?? colors.barColors[0] ?? FALLBACK_PRIMARY_BAR_COLOR,
-    })),
-  };
-};
-
-/* -------------------------------------------------------------------------- */
-/* Option merge                                                                */
-/* -------------------------------------------------------------------------- */
-
-export const mergeBarChartOptions = ({
-  generatedOptions,
-  options,
-}: {
-  readonly generatedOptions: EChartsOption;
-  readonly options?: BarChartOptions;
-}): EChartsOption => {
+export const mergeBarChartOptions = (
+  generatedOptions: EChartsOption,
+  options?: BarChartOptions,
+): EChartsOption => {
   if (!options) {
     return generatedOptions;
   }
 
-  const crosshairEnabled = options.crosshair ?? false;
-
-  const generatedTooltip = getTooltipConfig(generatedOptions.tooltip);
-
-  const customTooltip = getTooltipConfig(options.tooltip);
-
-  const generatedAxisPointer = getAxisPointerConfig(generatedTooltip.axisPointer);
-
-  const customAxisPointer = getAxisPointerConfig(customTooltip.axisPointer);
-
-  const generatedLegend = getRecordConfig(generatedOptions.legend);
-
-  const customLegend = getRecordConfig(options.legend);
-
-  const generatedGrid = getRecordConfig(generatedOptions.grid);
-
-  const customGrid = getRecordConfig(options.grid);
-
-  const generatedShadowStyle = getRecordConfig(generatedAxisPointer.shadowStyle);
-
-  const customShadowStyle = getRecordConfig(customAxisPointer.shadowStyle);
-
-  const tooltipTrigger = resolveTooltipTrigger({
-    crosshairEnabled,
-    customTrigger: customTooltip.trigger,
-    generatedTrigger: generatedTooltip.trigger,
-  });
-
-  const axisPointerType = resolveAxisPointerType({
-    crosshairEnabled,
-    customType: customAxisPointer.type,
-    generatedType: generatedAxisPointer.type,
-  });
-
   const {
     horizontal: _horizontal,
     barWidth: _barWidth,
-    crosshair: _crosshair,
-
-    tooltip: _tooltip,
-    legend: _legend,
-    grid: _grid,
-
-    series: customSeries,
-
-    ...remainingOptions
+    crosshair = false,
+    showLegend,
+    boldLabels: _boldLabels,
+    isBoxVisible: _isBoxVisible,
+    tooltip,
+    legend,
+    grid,
+    ...rest
   } = options;
 
-  const resolvedSeries = customSeries ?? generatedOptions.series;
+  const generatedTooltip = asTooltip(
+    generatedOptions.tooltip,
+  );
 
-  const mergedTooltip: TooltipOption = {
-    ...generatedTooltip,
-    ...customTooltip,
+  const customTooltip = asTooltip(tooltip);
 
-    trigger: tooltipTrigger,
+  const generatedPointer = asAxisPointer(
+    generatedTooltip.axisPointer,
+  );
 
-    axisPointer: {
-      ...generatedAxisPointer,
-      ...customAxisPointer,
+  const customPointer = asAxisPointer(
+    customTooltip.axisPointer,
+  );
 
-      show: crosshairEnabled,
-      type: axisPointerType,
-      snap: true,
+  const generatedLegend = asRecord(
+    generatedOptions.legend,
+  );
 
-      shadowStyle: {
-        ...generatedShadowStyle,
-        ...customShadowStyle,
-
-        color: 'transparent',
-        opacity: 0,
-      },
-    },
-  };
-
-  return compactObject({
+  return {
     ...generatedOptions,
-    ...remainingOptions,
+    ...rest,
 
     grid: {
-      ...generatedGrid,
-      ...customGrid,
+      ...asRecord(generatedOptions.grid),
+      ...asRecord(grid),
     },
 
     legend: {
       ...generatedLegend,
-      ...customLegend,
+
+      ...(showLegend !== undefined
+        ? {
+          show: showLegend,
+        }
+        : {}),
+
+      ...asRecord(legend),
     },
 
-    tooltip: mergedTooltip,
+    tooltip: {
+      ...generatedTooltip,
+      ...customTooltip,
 
-    series: resolvedSeries,
-  }) as unknown as EChartsOption;
+      trigger: crosshair
+        ? 'axis'
+        : resolveTooltipTrigger(
+          customTooltip.trigger,
+          resolveTooltipTrigger(
+            generatedTooltip.trigger,
+            'item',
+          ),
+        ),
+
+      axisPointer: {
+        ...generatedPointer,
+        ...customPointer,
+
+        show: crosshair,
+
+        type: crosshair
+          ? 'cross'
+          : resolveAxisPointerType(
+            customPointer.type,
+            resolveAxisPointerType(
+              generatedPointer.type,
+              'line',
+            ),
+          ),
+
+        snap: true,
+
+        shadowStyle: {
+          ...asRecord(
+            generatedPointer.shadowStyle,
+          ),
+
+          ...asRecord(
+            customPointer.shadowStyle,
+          ),
+
+          color: 'transparent',
+          opacity: 0,
+        },
+      },
+    },
+  };
 };

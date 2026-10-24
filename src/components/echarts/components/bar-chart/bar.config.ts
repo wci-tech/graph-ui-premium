@@ -1,77 +1,128 @@
-import type { BarSeriesOption, EChartsOption } from 'echarts';
+import type {
+  BarSeriesOption,
+  EChartsOption,
+} from 'echarts';
 
-import type { EChartsDefinition, EChartsSeriesDefinition } from '../../ECharts.types';
+import { compactObject } from '@wci-tech/core-ui-premium';
 
-const DEFAULT_BAR_COLOR = '#763d6c';
-const DEFAULT_BAR_WIDTH = 40;
+import type {
+  EChartsDefinition,
+  EChartsSeriesDefinition,
+} from '@/components/echarts/ECharts.types';
 
-const getSeriesColor = (series: EChartsSeriesDefinition): string =>
-  typeof series.color === 'string' ? series.color : DEFAULT_BAR_COLOR;
+import { BAR_CHART_CONFIG } from './base/BaseBarChart.constants';
 
-const getBarChartColors = (
-  definition: EChartsDefinition,
-):
-  | {
-      readonly barColors?: string[];
-      readonly labelColor?: string;
-      readonly axisColor?: string;
-      readonly gridColor?: string;
-    }
-  | undefined =>
-  definition['barChartColors'] as
-    | {
-        readonly barColors?: string[];
-        readonly labelColor?: string;
-        readonly axisColor?: string;
-        readonly gridColor?: string;
-      }
-    | undefined;
+interface BarChartColors {
+  readonly series: readonly string[];
+  readonly axisText: string;
+  readonly axisLine: string;
+  readonly grid: string;
+  readonly tooltipBackground: string;
+  readonly tooltipText: string;
+  readonly tooltipBorder: string;
+}
 
-const getSeriesStack = (item: EChartsSeriesDefinition): string | undefined => {
+const getSeriesColor = (
+  item: EChartsSeriesDefinition,
+  index: number,
+  colors: BarChartColors,
+): string =>
+  typeof item.color === 'string'
+    ? item.color
+    : colors.series[index % colors.series.length]!;
+
+const getSeriesStack = (
+  item: EChartsSeriesDefinition,
+): string | undefined => {
   const stack = item['stack'];
 
-  return typeof stack === 'string' ? stack : undefined;
+  return typeof stack === 'string'
+    ? stack
+    : undefined;
 };
 
-const createBarSeries = ({
+const getSeriesNumber = (
+  item: EChartsSeriesDefinition,
+  property: 'barWidth' | 'borderRadius',
+): number | undefined => {
+  const value = item[property];
+
+  return typeof value === 'number'
+    ? value
+    : undefined;
+};
+
+const createSeries = ({
   item,
-  isHorizontal,
+  index,
+  horizontal,
   barWidth,
+  colors,
 }: {
   readonly item: EChartsSeriesDefinition;
-  readonly isHorizontal: boolean;
+  readonly index: number;
+  readonly horizontal: boolean;
   readonly barWidth: number;
+  readonly colors: BarChartColors;
 }): BarSeriesOption => {
-  const mainColor = getSeriesColor(item);
-
-  const name = item.label ?? item.name;
+  const color = getSeriesColor(
+    item,
+    index,
+    colors,
+  );
 
   const stack = getSeriesStack(item);
 
-  const borderRadius = isHorizontal ? [0, 6, 6, 0] : [6, 6, 0, 0];
+  const resolvedBarWidth =
+    getSeriesNumber(item, 'barWidth') ??
+    barWidth;
 
-  return {
-    ...(name ? { name } : {}),
-    ...(stack ? { stack } : {}),
+  const borderRadius =
+    getSeriesNumber(item, 'borderRadius') ??
+    BAR_CHART_CONFIG.borderRadius;
+
+  const resolvedBorderRadius = horizontal
+    ? [0, borderRadius, borderRadius, 0]
+    : [borderRadius, borderRadius, 0, 0];
+
+  return compactObject({
+    id: `bar-series-${index}`,
+
+    name: item.label ?? item.name,
 
     type: 'bar',
 
     data: item.data,
 
-    barWidth,
-    barMaxWidth: barWidth,
+    stack,
+
+    barWidth: resolvedBarWidth,
+
+    barMaxWidth: resolvedBarWidth,
+
+    animation: true,
+
+    animationDuration:
+      BAR_CHART_CONFIG.animationDuration,
+
+    animationDurationUpdate:
+      BAR_CHART_CONFIG.animationDuration,
+
+    animationEasing: 'cubicOut',
+
+    animationEasingUpdate: 'cubicOut',
 
     itemStyle: {
-      color: mainColor,
-      borderRadius,
+      color,
+      borderRadius: resolvedBorderRadius,
     },
 
     emphasis: {
       focus: 'none',
 
       itemStyle: {
-        color: mainColor,
-        borderRadius,
+        color,
+        borderRadius: resolvedBorderRadius,
       },
     },
 
@@ -85,53 +136,147 @@ const createBarSeries = ({
       disabled: true,
     },
 
-    /*
-     * Supports the zero-value to real-value transition
-     * created by BaseBarChart.
-     */
     universalTransition: {
       enabled: true,
     },
-
-    animation: true,
-  };
+  }) as BarSeriesOption;
 };
 
-export const getBarConfig = (definition: EChartsDefinition): EChartsOption => {
-  const colors = getBarChartColors(definition);
+export const getBarConfig = (
+  definition: EChartsDefinition,
+): EChartsOption => {
+  const colors =
+    definition['barChartColors'] as
+    | BarChartColors
+    | undefined;
 
-  const isHorizontal = definition['horizontal'] === true;
+  if (!colors || colors.series.length === 0) {
+    return {};
+  }
 
-  const resolvedBarWidth = definition['barWidth'];
+  const horizontal =
+    definition['horizontal'] === true;
 
-  const barWidth = typeof resolvedBarWidth === 'number' ? resolvedBarWidth : DEFAULT_BAR_WIDTH;
+  const definitionBarWidth =
+    definition['barWidth'];
 
-  const labelColor = colors?.labelColor ?? '#4b5563';
+  const barWidth =
+    typeof definitionBarWidth === 'number'
+      ? definitionBarWidth
+      : BAR_CHART_CONFIG.barWidth;
 
-  const axisColor = colors?.axisColor ?? '#d1d5db';
+  const labels =
+    definition.labels ?? [];
 
-  const gridColor = colors?.gridColor ?? '#e5e7eb';
+  const series =
+    definition.series ?? [];
 
-  const series: BarSeriesOption[] = (definition.series ?? []).map((item) =>
-    createBarSeries({
-      item,
-      isHorizontal,
-      barWidth,
-    }),
+  const chartSeries = series.map(
+    (item, index) =>
+      createSeries({
+        item,
+        index,
+        horizontal,
+        barWidth,
+        colors,
+      }),
   );
+
+  const categoryAxis = {
+    type: 'category' as const,
+
+    data: labels,
+
+    boundaryGap: true,
+
+    axisLabel: {
+      show: true,
+      color: colors.axisText,
+      margin: 12,
+      interval: 0,
+      hideOverlap: false,
+    },
+
+    axisLine: {
+      show: true,
+
+      lineStyle: {
+        color: colors.axisLine,
+      },
+    },
+
+    axisTick: {
+      show: true,
+      alignWithLabel: true,
+
+      lineStyle: {
+        color: colors.axisLine,
+      },
+    },
+  };
+
+  const valueAxis = {
+    type: 'value' as const,
+
+    axisLabel: {
+      show: true,
+      color: colors.axisText,
+      margin: 10,
+    },
+
+    axisLine: {
+      show: true,
+
+      lineStyle: {
+        color: colors.axisLine,
+      },
+    },
+
+    axisTick: {
+      show: true,
+
+      lineStyle: {
+        color: colors.axisLine,
+      },
+    },
+
+    splitLine: {
+      show: true,
+
+      lineStyle: {
+        type: 'dashed' as const,
+        color: colors.grid,
+      },
+    },
+  };
 
   return {
     animation: true,
+
     animationThreshold: 10000,
 
-    animationDuration: 1800,
-    animationDurationUpdate: 1800,
+    animationDuration:
+      BAR_CHART_CONFIG.animationDuration,
+
+    animationDurationUpdate:
+      BAR_CHART_CONFIG.animationDuration,
 
     animationEasing: 'cubicOut',
+
     animationEasingUpdate: 'cubicOut',
 
     tooltip: {
       trigger: 'item',
+
+      backgroundColor:
+        colors.tooltipBackground,
+
+      borderColor:
+        colors.tooltipBorder,
+
+      textStyle: {
+        color: colors.tooltipText,
+      },
 
       axisPointer: {
         show: false,
@@ -145,118 +290,51 @@ export const getBarConfig = (definition: EChartsDefinition): EChartsOption => {
     },
 
     legend: {
-      show: series.length > 1,
-      top: 8,
+      show: chartSeries.length > 1,
+
+      top:
+        BAR_CHART_CONFIG.legend.top,
+
+      left: 'center',
+
+      itemWidth:
+        BAR_CHART_CONFIG.legend.itemWidth,
+
+      itemHeight:
+        BAR_CHART_CONFIG.legend.itemHeight,
+
+      itemGap:
+        BAR_CHART_CONFIG.legend.itemGap,
 
       textStyle: {
-        color: labelColor,
+        color: colors.axisText,
       },
     },
 
     grid: {
-      left: 8,
+      left:
+        BAR_CHART_CONFIG.grid.left,
 
-      right: 8,
+      right:
+        BAR_CHART_CONFIG.grid.right,
 
-      top: 36,
+      top:
+        BAR_CHART_CONFIG.grid.top,
 
-      bottom: 0,
+      bottom:
+        BAR_CHART_CONFIG.grid.bottom,
 
       containLabel: true,
     },
-    xAxis: isHorizontal
-      ? {
-          type: 'value',
 
-          axisLabel: {
-            color: labelColor,
-          },
+    xAxis: horizontal
+      ? valueAxis
+      : categoryAxis,
 
-          axisLine: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
+    yAxis: horizontal
+      ? categoryAxis
+      : valueAxis,
 
-          axisTick: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-
-          splitLine: {
-            lineStyle: {
-              color: gridColor,
-            },
-          },
-        }
-      : {
-          type: 'category',
-
-          data: definition.labels ?? [],
-
-          boundaryGap: true,
-
-          axisLabel: {
-            color: labelColor,
-          },
-
-          axisLine: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-
-          axisTick: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-        },
-
-    yAxis: isHorizontal
-      ? {
-          type: 'category',
-
-          data: definition.labels ?? [],
-
-          axisLabel: {
-            color: labelColor,
-          },
-
-          axisLine: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-
-          axisTick: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-        }
-      : {
-          type: 'value',
-
-          axisLabel: {
-            color: labelColor,
-          },
-
-          axisLine: {
-            lineStyle: {
-              color: axisColor,
-            },
-          },
-
-          splitLine: {
-            lineStyle: {
-              type: 'dashed',
-              color: gridColor,
-            },
-          },
-        },
-
-    series,
+    series: chartSeries,
   };
 };

@@ -2,10 +2,10 @@ import type { ReactNode, RefObject } from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
 
+import type { ChartJSEffect } from '@/components/chartjs/common-effects';
 import type { ChartCustomStyles, DownloadPlacement } from '@/engines/engine.types';
 
 import type { ChartJSData, ChartJSOptions, ChartjsProps } from '../../ChartJS.types';
-import type { ChartJSEffect } from '../../common-effects';
 
 export type AreaChartEffect = ChartJSEffect;
 
@@ -14,36 +14,19 @@ export type AreaChartAppearance = 'basic' | 'smooth';
 export interface AreaChartDataset {
   readonly label: string;
   readonly data: number[];
-  /**
-   * Overrides the automatically assigned series color.
-   */
   readonly color?: string;
-  /**
-   * Overrides the point color.
-   * Falls back to the resolved series color.
-   */
   readonly pointColor?: string;
   readonly pointRadius?: number;
   readonly pointHoverRadius?: number;
   readonly borderWidth?: number;
-
-  /**
-   * Overrides the tension resolved from appearance
-   * for this individual dataset.
-   */
   readonly tension?: number;
 }
 
 export interface AreaChartColors {
-  /**
-   * Overrides the automatic series palette.
-   */
   readonly series?: readonly string[];
-
   readonly axisText?: string;
   readonly axisLine?: string;
   readonly grid?: string;
-
   readonly tooltipBackground?: string;
   readonly tooltipText?: string;
   readonly tooltipBorder?: string;
@@ -55,17 +38,7 @@ export interface AreaChartColors {
  * CSS variables and consumer overrides have already
  * been converted to values that can be used by Canvas.
  */
-export interface AreaChartResolvedColors {
-  readonly series: readonly string[];
-
-  readonly axisText: string;
-  readonly axisLine: string;
-  readonly grid: string;
-
-  readonly tooltipBackground: string;
-  readonly tooltipText: string;
-  readonly tooltipBorder: string;
-}
+export type AreaChartResolvedColors = Required<AreaChartColors>;
 
 export interface AreaChartCustomStyles {
   readonly wrapper?: StyleType;
@@ -82,9 +55,7 @@ export type AreaChartOptions = ChartJSOptions & {
 export interface AreaChartProps {
   readonly labels: string[];
   readonly data: AreaChartDataset[];
-
   readonly effect?: AreaChartEffect;
-
   readonly appearance?: AreaChartAppearance;
 
   /**
@@ -120,7 +91,7 @@ export interface AreaChartProps {
 /* Hook Types                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export type UseAreaChartProps = Pick<
+export type AreaChartHookProps = Pick<
   AreaChartProps,
   | 'data'
   | 'labels'
@@ -141,16 +112,11 @@ export interface AreaChartWrapperProps {
   readonly 'data-effect'?: string;
 }
 
-export interface UseAreaChartReturn {
+export interface AreaChartHookReturn {
   readonly wrapperRef: RefObject<HTMLDivElement | null>;
-
   readonly processedData: ChartJSData;
-
   readonly areaOptions: ChartjsProps['options'] | undefined;
-
   readonly plugins: NonNullable<ChartjsProps['plugins']>;
-
   readonly wrapperProps: AreaChartWrapperProps;
-
   readonly isReady: boolean;
 }

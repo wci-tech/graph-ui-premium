@@ -8,7 +8,7 @@ import { getEChartsAlphaColor } from '@/components/echarts/utils/EChartsPointHal
 import type {
   EChartsDefinition,
   EChartsSeriesDefinition,
-} from '../../ECharts.types';
+} from '@/components/echarts/ECharts.types';
 
 import { AREA_CHART_CONFIG } from './base/BaseAreaChart.constants';
 

@@ -5,9 +5,9 @@ import { compactObject } from '@wci-tech/core-ui-premium';
 import { createPointHaloPlugin } from '@/components/chartjs/plugin/PointHaloPlugin';
 
 import type {
+  AreaChartHookProps,
+  AreaChartHookReturn,
   AreaChartResolvedColors,
-  UseAreaChartProps,
-  UseAreaChartReturn,
 } from '../AreaChart.types';
 import { AREA_CHART_CONFIG } from '../base/BaseAreaChart.constants';
 import {
@@ -27,7 +27,7 @@ export const useAreaChart = ({
   rendererCustomStyles,
   className,
   testId = 'area-chart-test-id',
-}: UseAreaChartProps): UseAreaChartReturn => {
+}: AreaChartHookProps): AreaChartHookReturn => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
@@ -58,7 +58,7 @@ export const useAreaChart = ({
    * Build the Chart.js AreaChart data after all colors
    * have been resolved.
    */
-  const processedData = useMemo<UseAreaChartReturn['processedData']>(() => {
+  const processedData = useMemo<AreaChartHookReturn['processedData']>(() => {
     if (!resolvedColors || !rootElement) {
       return {
         labels: Array.from(labels),
@@ -78,7 +78,7 @@ export const useAreaChart = ({
   /**
    * Build the Chart.js options using resolved semantic colors.
    */
-  const areaOptions = useMemo<UseAreaChartReturn['areaOptions']>(() => {
+  const areaOptions = useMemo<AreaChartHookReturn['areaOptions']>(() => {
     if (!resolvedColors) {
       return undefined;
     }
@@ -94,7 +94,7 @@ export const useAreaChart = ({
   /**
    * AreaChart-specific Chart.js plugins.
    */
-  const plugins = useMemo<UseAreaChartReturn['plugins']>(
+  const plugins = useMemo<AreaChartHookReturn['plugins']>(
     () => [
       createPointHaloPlugin({
         enabled: true,
@@ -109,7 +109,7 @@ export const useAreaChart = ({
    * Wrapper attributes used by tests, styling,
    * effects and appearance selectors.
    */
-  const wrapperProps = useMemo<UseAreaChartReturn['wrapperProps']>(
+  const wrapperProps = useMemo<AreaChartHookReturn['wrapperProps']>(
     () =>
       compactObject({
         className,

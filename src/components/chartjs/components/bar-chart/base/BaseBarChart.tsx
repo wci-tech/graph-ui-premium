@@ -47,15 +47,10 @@ export const BaseBarChart = ({
 
   const chartjsProps: ChartjsProps = compactObject({
     type: 'bar' as const,
-
     data: processedData,
-
     options: barOptions,
-
     showDownload,
-
     downloadPlacement,
-
     customStyles: rendererCustomStyles,
   });
 

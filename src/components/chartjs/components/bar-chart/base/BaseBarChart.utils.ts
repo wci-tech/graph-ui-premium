@@ -4,6 +4,7 @@ import {
   CHART_COLOR_VARIABLES,
   CHART_TOKEN_VARIABLES,
 } from '@/common/constants/Chart.colors';
+import { isRecord } from '@/common/utils/Common.utils';
 import type {
   ChartJSData,
   ChartJSDataset,
@@ -22,19 +23,11 @@ import { BAR_CHART_CONFIG } from './BaseBarChart.constants';
 const CSS_VARIABLE_PATTERN =
   /^var\(\s*(--[^,\s)]+)\s*(?:,\s*(.+))?\)$/;
 
-const isRecord = (
-  value: unknown,
-): value is Record<string, unknown> =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value);
-
 const getRecordConfig = (
   source: Record<string, unknown> | undefined,
   key: string,
 ): Record<string, unknown> => {
   const value = source?.[key];
-
   return isRecord(value) ? value : {};
 };
 
@@ -45,9 +38,7 @@ const resolveCssVariable = (
   styles: CSSStyleDeclaration,
   variableName: string,
 ): string => {
-  const value = styles
-    .getPropertyValue(variableName)
-    .trim();
+  const value = styles.getPropertyValue(variableName).trim();
 
   if (!value) {
     throw new Error(
@@ -62,17 +53,14 @@ const resolveCssVariable = (
  * Resolves a color before passing it to Chart.js.
  *
  * Canvas APIs cannot understand CSS var() expressions directly,
- * therefore CSS variables are converted to their computed values.
+ * therefore CSS variables are converted to computed values.
  */
 const resolveColor = (
   styles: CSSStyleDeclaration,
   color: string,
 ): string => {
   const normalizedColor = color.trim();
-
-  const match = normalizedColor.match(
-    CSS_VARIABLE_PATTERN,
-  );
+  const match = normalizedColor.match(CSS_VARIABLE_PATTERN);
 
   if (!match) {
     return normalizedColor;
@@ -84,24 +72,16 @@ const resolveColor = (
     return normalizedColor;
   }
 
-  const resolvedColor = styles
-    .getPropertyValue(variableName)
-    .trim();
+  const resolvedColor = styles.getPropertyValue(variableName).trim();
 
   if (resolvedColor) {
-    return resolveColor(
-      styles,
-      resolvedColor,
-    );
+    return resolveColor(styles, resolvedColor);
   }
 
   const fallback = match[2]?.trim();
 
   if (fallback) {
-    return resolveColor(
-      styles,
-      fallback,
-    );
+    return resolveColor(styles, fallback);
   }
 
   throw new Error(
@@ -112,16 +92,24 @@ const resolveColor = (
 const resolveDefaultSeriesColors = (
   styles: CSSStyleDeclaration,
 ): readonly string[] =>
-  CHART_COLOR_VARIABLES.map(
-    (variableName) =>
-      resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          variableName,
-        ),
-      ),
+  CHART_COLOR_VARIABLES.map((variableName) =>
+    resolveColor(
+      styles,
+      resolveCssVariable(styles, variableName),
+    ),
   );
+
+const resolveTokenColor = (
+  styles: CSSStyleDeclaration,
+  color: string | undefined,
+  variableName: string,
+): string =>
+  color
+    ? resolveColor(styles, color)
+    : resolveColor(
+      styles,
+      resolveCssVariable(styles, variableName),
+    );
 
 /**
  * Resolves all chart-level colors.
@@ -136,8 +124,7 @@ export const resolveBarChartColors = (
   const styles = getComputedStyle(element);
 
   const series =
-    colors?.series &&
-      colors.series.length > 0
+    colors?.series?.length
       ? colors.series.map((color) =>
         resolveColor(styles, color),
       )
@@ -145,85 +132,36 @@ export const resolveBarChartColors = (
 
   return {
     series,
-
-    axisText: colors?.axisText
-      ? resolveColor(
-        styles,
-        colors.axisText,
-      )
-      : resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          CHART_TOKEN_VARIABLES.axisText,
-        ),
-      ),
-
-    axisLine: colors?.axisLine
-      ? resolveColor(
-        styles,
-        colors.axisLine,
-      )
-      : resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          CHART_TOKEN_VARIABLES.axisLine,
-        ),
-      ),
-
-    grid: colors?.grid
-      ? resolveColor(
-        styles,
-        colors.grid,
-      )
-      : resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          CHART_TOKEN_VARIABLES.grid,
-        ),
-      ),
-
-    tooltipBackground:
-      colors?.tooltipBackground
-        ? resolveColor(
-          styles,
-          colors.tooltipBackground,
-        )
-        : resolveColor(
-          styles,
-          resolveCssVariable(
-            styles,
-            CHART_TOKEN_VARIABLES.tooltipBackground,
-          ),
-        ),
-
-    tooltipText: colors?.tooltipText
-      ? resolveColor(
-        styles,
-        colors.tooltipText,
-      )
-      : resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          CHART_TOKEN_VARIABLES.tooltipText,
-        ),
-      ),
-
-    tooltipBorder: colors?.tooltipBorder
-      ? resolveColor(
-        styles,
-        colors.tooltipBorder,
-      )
-      : resolveColor(
-        styles,
-        resolveCssVariable(
-          styles,
-          CHART_TOKEN_VARIABLES.tooltipBorder,
-        ),
-      ),
+    axisText: resolveTokenColor(
+      styles,
+      colors?.axisText,
+      CHART_TOKEN_VARIABLES.axisText,
+    ),
+    axisLine: resolveTokenColor(
+      styles,
+      colors?.axisLine,
+      CHART_TOKEN_VARIABLES.axisLine,
+    ),
+    grid: resolveTokenColor(
+      styles,
+      colors?.grid,
+      CHART_TOKEN_VARIABLES.grid,
+    ),
+    tooltipBackground: resolveTokenColor(
+      styles,
+      colors?.tooltipBackground,
+      CHART_TOKEN_VARIABLES.tooltipBackground,
+    ),
+    tooltipText: resolveTokenColor(
+      styles,
+      colors?.tooltipText,
+      CHART_TOKEN_VARIABLES.tooltipText,
+    ),
+    tooltipBorder: resolveTokenColor(
+      styles,
+      colors?.tooltipBorder,
+      CHART_TOKEN_VARIABLES.tooltipBorder,
+    ),
   };
 };
 
@@ -240,16 +178,10 @@ const getSeriesColor = (
   styles: CSSStyleDeclaration,
 ): string => {
   if (dataset.color) {
-    return resolveColor(
-      styles,
-      dataset.color,
-    );
+    return resolveColor(styles, dataset.color);
   }
 
-  const color =
-    colors.series[
-    index % colors.series.length
-    ];
+  const color = colors.series[index % colors.series.length];
 
   if (!color) {
     throw new Error(
@@ -257,10 +189,7 @@ const getSeriesColor = (
     );
   }
 
-  return resolveColor(
-    styles,
-    color,
-  );
+  return resolveColor(styles, color);
 };
 
 /**
@@ -285,61 +214,49 @@ export const createBarChartData = ({
 
   return {
     labels,
+    datasets: data.map<ChartJSDataset>((dataset, index) => {
+      const barColor = getSeriesColor(
+        dataset,
+        index,
+        colors,
+        styles,
+      );
 
-    datasets: data.map<ChartJSDataset>(
-      (dataset, index) => {
-        const barColor = getSeriesColor(
-          dataset,
-          index,
-          colors,
-          styles,
-        );
+      const barWidth =
+        dataset.barWidth ??
+        options?.barWidth ??
+        BAR_CHART_CONFIG.barWidth;
 
-        const barWidth =
-          dataset.barWidth ??
-          options?.barWidth ??
-          BAR_CHART_CONFIG.barWidth;
-
-        return {
-          ...dataset,
-
-          backgroundColor: barColor,
-
-          borderColor: barColor,
-
-          borderWidth:
-            dataset.borderWidth ??
-            BAR_CHART_CONFIG.borderWidth,
-
-          borderRadius:
-            dataset.borderRadius ??
-            BAR_CHART_CONFIG.borderRadius,
-
-          borderSkipped: false,
-
-          barThickness: barWidth,
-
-          maxBarThickness:
-            dataset.maxBarWidth ??
-            barWidth,
-
-          categoryPercentage:
-            dataset.categoryPercentage ??
-            options?.categoryPercentage ??
-            BAR_CHART_CONFIG.categoryPercentage,
-
-          barPercentage:
-            dataset.barPercentage ??
-            options?.barPercentage ??
-            BAR_CHART_CONFIG.barPercentage,
-        };
-      },
-    ),
+      return {
+        ...dataset,
+        backgroundColor: barColor,
+        borderColor: barColor,
+        borderWidth:
+          dataset.borderWidth ??
+          BAR_CHART_CONFIG.borderWidth,
+        borderRadius:
+          dataset.borderRadius ??
+          BAR_CHART_CONFIG.borderRadius,
+        borderSkipped: false,
+        barThickness: barWidth,
+        maxBarThickness:
+          dataset.maxBarWidth ??
+          barWidth,
+        categoryPercentage:
+          dataset.categoryPercentage ??
+          options?.categoryPercentage ??
+          BAR_CHART_CONFIG.categoryPercentage,
+        barPercentage:
+          dataset.barPercentage ??
+          options?.barPercentage ??
+          BAR_CHART_CONFIG.barPercentage,
+      };
+    }),
   };
 };
 
 /**
- * Creates the final Chart.js options.
+ * Creates the final Chart.js BarChart options.
  *
  * Precedence:
  * WCI root tokens -> colors prop -> direct Chart.js options.
@@ -359,42 +276,34 @@ export const createBarChartOptions = ({
     optionRecord,
     'scales',
   );
-
   const xScaleConfig = getRecordConfig(
     scalesConfig,
     'x',
   );
-
   const yScaleConfig = getRecordConfig(
     scalesConfig,
     'y',
   );
-
   const xGridConfig = getRecordConfig(
     xScaleConfig,
     'grid',
   );
-
   const yGridConfig = getRecordConfig(
     yScaleConfig,
     'grid',
   );
-
   const xBorderConfig = getRecordConfig(
     xScaleConfig,
     'border',
   );
-
   const yBorderConfig = getRecordConfig(
     yScaleConfig,
     'border',
   );
-
   const xTicksConfig = getRecordConfig(
     xScaleConfig,
     'ticks',
   );
-
   const yTicksConfig = getRecordConfig(
     yScaleConfig,
     'ticks',
@@ -404,242 +313,158 @@ export const createBarChartOptions = ({
     optionRecord,
     'plugins',
   );
-
   const legendConfig = getRecordConfig(
     pluginOptions,
     'legend',
   );
-
-  const legendLabelsConfig =
-    getRecordConfig(
-      legendConfig,
-      'labels',
-    );
-
+  const legendLabelsConfig = getRecordConfig(
+    legendConfig,
+    'labels',
+  );
   const tooltipConfig = getRecordConfig(
     pluginOptions,
     'tooltip',
   );
-
-  const tooltipCallbacksConfig =
-    getRecordConfig(
-      tooltipConfig,
-      'callbacks',
-    );
-
-  const datalabelsConfig =
-    getRecordConfig(
-      pluginOptions,
-      'datalabels',
-    );
-
+  const tooltipCallbacksConfig = getRecordConfig(
+    tooltipConfig,
+    'callbacks',
+  );
+  const datalabelsConfig = getRecordConfig(
+    pluginOptions,
+    'datalabels',
+  );
   const crosshairConfig = getRecordConfig(
     pluginOptions,
     'crosshair',
   );
-
-  const candlestickCrosshairConfig =
-    getRecordConfig(
-      pluginOptions,
-      'candlestickCrosshair',
-    );
-
-  const interactionConfig =
-    getRecordConfig(
-      optionRecord,
-      'interaction',
-    );
+  const candlestickCrosshairConfig = getRecordConfig(
+    pluginOptions,
+    'candlestickCrosshair',
+  );
+  const interactionConfig = getRecordConfig(
+    optionRecord,
+    'interaction',
+  );
 
   const crosshairEnabled =
     options?.crosshair ?? false;
 
+  const labelWeight = options?.boldLabels
+    ? 'bold'
+    : 'normal';
+
   return {
     ...options,
-
-    indexAxis: options?.horizontal
-      ? 'y'
-      : 'x',
-
+    indexAxis: options?.horizontal ? 'y' : 'x',
     responsive: true,
-
     maintainAspectRatio: false,
-
     interaction: {
       mode: 'nearest',
-
       intersect: true,
-
       ...interactionConfig,
     },
-
     scales: {
       ...scalesConfig,
-
       x: {
         ...xScaleConfig,
-
         grid: {
           color: colors.grid,
-
           drawBorder: false,
-
           ...xGridConfig,
         },
-
         border: {
           color: colors.axisLine,
-
           ...xBorderConfig,
         },
-
         ticks: {
           color: colors.axisText,
-
           font: {
-            weight: options?.boldLabels
-              ? 'bold'
-              : 'normal',
+            weight: labelWeight,
           },
-
           ...xTicksConfig,
         },
       },
-
       y: {
         ...yScaleConfig,
-
         beginAtZero: true,
-
         grid: {
           color: colors.grid,
-
           drawBorder: false,
-
           ...yGridConfig,
         },
-
         border: {
           color: colors.axisLine,
-
           ...yBorderConfig,
         },
-
         ticks: {
           color: colors.axisText,
-
           font: {
-            weight: options?.boldLabels
-              ? 'bold'
-              : 'normal',
+            weight: labelWeight,
           },
-
           ...yTicksConfig,
         },
       },
     },
-
     plugins: {
       ...pluginOptions,
-
       crosshair: {
         enabled: crosshairEnabled,
-
         ...crosshairConfig,
       },
-
       candlestickCrosshair: {
         enabled: crosshairEnabled,
-
         ...candlestickCrosshairConfig,
       },
-
       legend: {
-        display:
-          options?.showLegend ?? true,
-
+        display: options?.showLegend ?? true,
         position: 'top',
-
         align: 'center',
-
         ...legendConfig,
-
         labels: {
           usePointStyle: false,
-
-          boxWidth:
-            BAR_CHART_CONFIG.legendBoxWidth,
-
-          boxHeight:
-            BAR_CHART_CONFIG.legendBoxHeight,
-
-          padding:
-            BAR_CHART_CONFIG.legendPadding,
-
+          boxWidth: BAR_CHART_CONFIG.legendBoxWidth,
+          boxHeight: BAR_CHART_CONFIG.legendBoxHeight,
+          padding: BAR_CHART_CONFIG.legendPadding,
           color: colors.axisText,
-
           font: {
             weight: options?.boldLegends
               ? 'bold'
               : 'normal',
           },
-
           ...legendLabelsConfig,
         },
       },
-
       tooltip: {
         mode: 'nearest',
-
         intersect: true,
-
         position: 'nearest',
-
         caretPadding:
           BAR_CHART_CONFIG.tooltipCaretPadding,
-
-        backgroundColor:
-          colors.tooltipBackground,
-
-        titleColor:
-          colors.tooltipText,
-
-        bodyColor:
-          colors.tooltipText,
-
-        borderColor:
-          colors.tooltipBorder,
-
+        backgroundColor: colors.tooltipBackground,
+        titleColor: colors.tooltipText,
+        bodyColor: colors.tooltipText,
+        borderColor: colors.tooltipBorder,
         ...tooltipConfig,
-
         callbacks: {
-          label: (
-            context: TooltipItem<'bar'>,
-          ) => {
+          label: (context: TooltipItem<'bar'>) => {
             const datasetLabel =
-              context.dataset.label ??
-              'Dataset';
+              context.dataset.label ?? 'Dataset';
 
-            const value =
-              options?.horizontal
-                ? context.parsed.x
-                : context.parsed.y;
+            const value = options?.horizontal
+              ? context.parsed.x
+              : context.parsed.y;
 
             return `${datasetLabel}: ${value}`;
           },
-
           ...tooltipCallbacksConfig,
         },
       },
-
       datalabels: {
         display: false,
-
         color: colors.axisText,
-
         ...datalabelsConfig,
       },
     },
-
     onClick: options?.['onClick'],
   };
 };

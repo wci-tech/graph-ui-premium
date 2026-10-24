@@ -8,9 +8,9 @@ import {
 import { compactObject } from '@wci-tech/core-ui-premium';
 
 import type {
+  BarChartHookProps,
+  BarChartHookReturn,
   BarChartResolvedColors,
-  UseBarChartProps,
-  UseBarChartReturn,
 } from '../BarChart.types';
 import {
   createBarChartData,
@@ -28,7 +28,7 @@ export const useBarChart = ({
   rendererCustomStyles,
   className,
   testId = 'bar-chart-test-id',
-}: UseBarChartProps): UseBarChartReturn => {
+}: BarChartHookProps): BarChartHookReturn => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const [rootElement, setRootElement] =
@@ -70,7 +70,7 @@ export const useBarChart = ({
    * have been resolved.
    */
   const processedData = useMemo<
-    UseBarChartReturn['processedData']
+    BarChartHookReturn['processedData']
   >(() => {
     if (!resolvedColors || !rootElement) {
       return {
@@ -100,7 +100,7 @@ export const useBarChart = ({
    * Build the Chart.js options using resolved semantic colors.
    */
   const barOptions = useMemo<
-    UseBarChartReturn['barOptions']
+    BarChartHookReturn['barOptions']
   >(() => {
     if (!resolvedColors) {
       return undefined;
@@ -122,7 +122,7 @@ export const useBarChart = ({
    * styling and effects.
    */
   const wrapperProps = useMemo<
-    UseBarChartReturn['wrapperProps']
+    BarChartHookReturn['wrapperProps']
   >(
     () =>
       compactObject({

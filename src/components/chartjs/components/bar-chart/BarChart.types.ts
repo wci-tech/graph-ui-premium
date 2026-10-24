@@ -2,14 +2,10 @@ import type { ReactNode, RefObject } from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
 
+import type { ChartJSEffect } from '@/components/chartjs/common-effects';
 import type { ChartCustomStyles, DownloadPlacement } from '@/engines/engine.types';
 
-import type {
-  ChartJSData,
-  ChartJSOptions,
-  ChartjsProps,
-} from '../../ChartJS.types';
-import type { ChartJSEffect } from '../../common-effects';
+import type { ChartJSData, ChartJSOptions, ChartjsProps } from '../../ChartJS.types';
 
 export type BarChartEffect = ChartJSEffect;
 
@@ -64,17 +60,7 @@ export interface BarChartColors {
  * CSS variables and consumer overrides have already
  * been converted to values that can be used by Canvas.
  */
-export interface BarChartResolvedColors {
-  readonly series: readonly string[];
-
-  readonly axisText: string;
-  readonly axisLine: string;
-  readonly grid: string;
-
-  readonly tooltipBackground: string;
-  readonly tooltipText: string;
-  readonly tooltipBorder: string;
-}
+export type BarChartResolvedColors = Required<BarChartColors>;
 
 export interface BarChartCustomStyles {
   readonly wrapper?: StyleType;
@@ -102,7 +88,6 @@ export type BarChartOptions = ChartJSOptions & {
 export interface BarChartProps {
   readonly labels: string[];
   readonly data: BarChartDataset[];
-
   readonly effect?: BarChartEffect;
 
   /**
@@ -138,7 +123,7 @@ export interface BarChartProps {
 /* Hook Types                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export type UseBarChartProps = Pick<
+export type BarChartHookProps = Pick<
   BarChartProps,
   | 'data'
   | 'labels'
@@ -157,14 +142,10 @@ export interface BarChartWrapperProps {
   readonly 'data-effect'?: string;
 }
 
-export interface UseBarChartReturn {
+export interface BarChartHookReturn {
   readonly wrapperRef: RefObject<HTMLDivElement | null>;
-
   readonly processedData: ChartJSData;
-
   readonly barOptions: ChartjsProps['options'] | undefined;
-
   readonly wrapperProps: BarChartWrapperProps;
-
   readonly isReady: boolean;
 }
