@@ -1,5 +1,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { toNumberSeriesData } from '@/common/utils/adaptersHelper.utils';
 import type {
     BarLineChartAppearance,
     BarLineChartColors,
@@ -62,7 +63,7 @@ const toBarLineChartData = (
     series.map((seriesItem, index) =>
         compactObject({
             label: seriesItem.label,
-            data: Array.from(seriesItem.data),
+            data: toNumberSeriesData(seriesItem.data),
             type: index === 0 ? 'bar' : 'line',
             color: seriesItem.color,
             pointRadius: seriesItem.pointRadius,

@@ -1,5 +1,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { toNumberSeriesData } from '@/common/utils/adaptersHelper.utils';
 import type {
     BarLineChartDataset,
     BarLineChartEffect,
@@ -27,7 +28,9 @@ const resolveEffect = (
 const resolveAppearance = (
     appearance: EngineRendererProps['appearance'],
 ): BarLineChartProps['appearance'] =>
-    appearance === 'basic' || appearance === 'smooth' ? appearance : undefined;
+    appearance === 'basic' || appearance === 'smooth'
+        ? appearance
+        : undefined;
 
 const toBarLineChartData = (
     series: EngineRendererProps['data']['series'],
@@ -36,7 +39,7 @@ const toBarLineChartData = (
         compactObject({
             type: index === 0 ? 'bar' : 'line',
             label: seriesItem.label,
-            data: Array.from(seriesItem.data),
+            data: toNumberSeriesData(seriesItem.data),
             color: seriesItem.color,
             pointRadius: seriesItem.pointRadius,
             borderWidth: seriesItem.borderWidth,

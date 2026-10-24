@@ -5,6 +5,7 @@ import { getAreaConfig } from '@/components/echarts/components/area-chart/area.c
 
 import { getBarConfig } from '../components/bar-chart/bar.config';
 import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
+import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -72,9 +73,10 @@ export const getChartSpecificEChartsConfig = (
   switch (definition.type) {
     case 'area':
       return getAreaConfig(definition);
-
     case 'bar':
       return getBarConfig(definition);
+    case 'bubble':
+      return getBubbleConfig(definition);
 
     case 'bar-line':
       return getBarLineConfig(definition);

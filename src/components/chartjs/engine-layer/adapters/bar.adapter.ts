@@ -1,5 +1,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { toNumberSeriesData } from '@/common/utils/adaptersHelper.utils';
 import type {
     BarChartDataset,
     BarChartEffect,
@@ -30,7 +31,7 @@ const toBarChartData = (
     series.map((seriesItem) =>
         compactObject({
             label: seriesItem.label,
-            data: Array.from(seriesItem.data),
+            data: toNumberSeriesData(seriesItem.data),
             color: seriesItem.color,
             borderWidth: seriesItem.borderWidth,
         }),

@@ -1,5 +1,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { toNumberSeriesData } from '@/common/utils/adaptersHelper.utils';
 import type {
   AreaChartAppearance,
   AreaChartColors,
@@ -66,8 +67,7 @@ const toAreaChartData = (
   series.map((seriesItem) =>
     compactObject({
       label: seriesItem.label,
-      data: Array.from(seriesItem.data),
-
+      data: toNumberSeriesData(seriesItem.data),
       color: seriesItem.color,
       pointColor: seriesItem.pointColor,
       pointRadius: seriesItem.pointRadius,
@@ -92,22 +92,13 @@ export const adaptEChartsAreaProps = ({
       labels: Array.from(data.labels),
       series: toAreaChartData(data.series),
     },
-
     colors: resolveColors(colors),
-
     options: resolveOptions(options),
-
     appearance: resolveAppearance(appearance),
-
     effect: resolveEffect(effect),
-
     showDownload,
-
     downloadPlacement,
-
     rendererCustomStyles: customStyles,
-
     className,
-
     testId,
   });
