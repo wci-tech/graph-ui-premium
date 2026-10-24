@@ -1,9 +1,10 @@
 /** @jsxImportSource @emotion/react */
 
-import { AreaChart, BarChart, BubbleChart } from '@/components/chartjs/components';
+import { AreaChart, BarChart, BarLineChart, BubbleChart } from '@/components/chartjs/components';
 
 import { adaptChartJSAreaProps } from './adapters/area.adapter';
 import { adaptChartJSBarProps } from './adapters/bar.adapter';
+import { adaptChartJSBarLineProps } from './adapters/bar-line.adapter';
 import { adaptChartJSBubbleProps } from './adapters/bubble.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
@@ -16,5 +17,8 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   bubble: {
     render: (props) => <BubbleChart {...adaptChartJSBubbleProps(props)} />,
+  },
+  'bar-line': {
+    render: (props) => <BarLineChart {...adaptChartJSBarLineProps(props)} />,
   },
 };
