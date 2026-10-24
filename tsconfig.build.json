@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build"
+  },
+  "include": [
+    "src",
+    "src/types/themes.d.ts",
+    "src/types/common.d.ts",
+    "src/types/assets.d.ts",
+    "tsup.config.ts"
+  ],
+  "exclude": [
+    "tests",
+    "node_modules",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    ".storybook",
+    "stories",
+    "cypress",
+    "**/*.cy.ts",
+    "**/*.cy.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "tests-types"
+  ]
+}
