@@ -6,6 +6,7 @@ import { getAreaConfig } from '@/components/echarts/components/area-chart/area.c
 import { getBarConfig } from '../components/bar-chart/bar.config';
 import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
+import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -35,27 +36,26 @@ export const isEChartsDefinition = (
  */
 export const getBaseEChartsConfig = (
   type: SupportedEChartType,
-): EChartsOption => ({
-  backgroundColor: 'transparent',
-  animation: true,
+): EChartsOption => {
+  const isItemTooltip = type === 'pie';
+  const isShadowPointer =
+    type === 'bar' || type === 'bar-line';
 
-  tooltip: {
-    trigger: type === 'pie' ? 'item' : 'axis',
-
-    axisPointer: {
-      type:
-        type === 'bar' || type === 'bar-line'
-          ? 'shadow'
-          : 'line',
+  return {
+    backgroundColor: 'transparent',
+    animation: true,
+    tooltip: {
+      trigger: isItemTooltip ? 'item' : 'axis',
+      axisPointer: {
+        type: isShadowPointer ? 'shadow' : 'line',
+      },
+      backgroundColor: 'var(--wci-overlay-white-10)',
+      textStyle: {
+        color: 'var(--wci-black)',
+      },
     },
-
-    backgroundColor: 'var(--wci-overlay-white-10)',
-
-    textStyle: {
-      color: 'var(--wci-black)',
-    },
-  },
-});
+  };
+};
 
 /**
  * Resolves the chart-specific ECharts configuration.
@@ -66,7 +66,6 @@ export const getBaseEChartsConfig = (
  * @param definition - Normalized ECharts chart definition.
  * @returns Chart-specific ECharts configuration.
  */
-
 export const getChartSpecificEChartsConfig = (
   definition: EChartsDefinition,
 ): EChartsOption => {
@@ -75,12 +74,12 @@ export const getChartSpecificEChartsConfig = (
       return getAreaConfig(definition);
     case 'bar':
       return getBarConfig(definition);
-    case 'bubble':
-      return getBubbleConfig(definition);
-
     case 'bar-line':
       return getBarLineConfig(definition);
-
+    case 'bubble':
+      return getBubbleConfig(definition);
+    case 'candlestick':
+      return getCandlestickConfig(definition);
     default:
       return {};
   }

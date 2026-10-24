@@ -1,6 +1,7 @@
 import type {
     ChartBubblePoint,
     ChartBubbleTuple,
+    ChartCandlestickPoint,
     ChartSeriesData,
 } from '@/engines/engine.types';
 
@@ -38,6 +39,37 @@ export const isBubbleTuple = (
     typeof value[1] === 'number' &&
     typeof value[2] === 'number';
 
+export const isCandlestickPoint = (
+    value: unknown,
+): value is ChartCandlestickPoint => {
+    if (
+        typeof value !== 'object' ||
+        value === null ||
+        Array.isArray(value)
+    ) {
+        return false;
+    }
+
+    const point = value as Record<string, unknown>;
+    const timestamp = point['t'];
+
+    return (
+        (typeof timestamp === 'string' ||
+            typeof timestamp === 'number' ||
+            timestamp instanceof Date) &&
+        (typeof point['o'] === 'number' ||
+            typeof point['o'] === 'string') &&
+        (typeof point['h'] === 'number' ||
+            typeof point['h'] === 'string') &&
+        (typeof point['l'] === 'number' ||
+            typeof point['l'] === 'string') &&
+        (typeof point['c'] === 'number' ||
+            typeof point['c'] === 'string') &&
+        (typeof point['v'] === 'number' ||
+            typeof point['v'] === 'string')
+    );
+};
+
 export const isBubblePointSeriesData = (
     data: ChartSeriesData,
 ): data is readonly ChartBubblePoint[] =>
@@ -47,6 +79,11 @@ export const isBubbleTupleSeriesData = (
     data: ChartSeriesData,
 ): data is readonly ChartBubbleTuple[] =>
     data.every(isBubbleTuple);
+
+export const isCandlestickSeriesData = (
+    data: ChartSeriesData,
+): data is readonly ChartCandlestickPoint[] =>
+    data.every(isCandlestickPoint);
 
 export const toNumberSeriesData = (
     data: ChartSeriesData,
@@ -88,4 +125,14 @@ export const toBubbleTupleSeriesData = (
     }
 
     return [];
+};
+
+export const toCandlestickSeriesData = (
+    data: ChartSeriesData,
+): ChartCandlestickPoint[] => {
+    if (!isCandlestickSeriesData(data)) {
+        return [];
+    }
+
+    return Array.from(data);
 };
