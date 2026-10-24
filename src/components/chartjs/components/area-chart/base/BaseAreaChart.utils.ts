@@ -140,9 +140,9 @@ export const resolveAreaChartColors = (
     tooltipBackground: colors?.tooltipBackground
       ? resolveColor(styles, colors.tooltipBackground)
       : resolveColor(
-          styles,
-          resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBackground),
-        ),
+        styles,
+        resolveCssVariable(styles, CHART_TOKEN_VARIABLES.tooltipBackground),
+      ),
 
     tooltipText: colors?.tooltipText
       ? resolveColor(styles, colors.tooltipText)

@@ -1,8 +1,9 @@
 import type { EChartsOption } from 'echarts';
 
 import { isRecord } from '@/common/utils/Common.utils';
+import { getAreaConfig } from '@/components/echarts/components/area-chart/area.config';
 
-import { getAreaConfig } from '../components/area-chart/area.config';
+import { getBarConfig } from '../components/bar-chart/bar.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -34,14 +35,16 @@ export const getBaseEChartsConfig = (
   type: SupportedEChartType,
 ): EChartsOption => ({
   backgroundColor: 'transparent',
-
   animation: true,
 
   tooltip: {
     trigger: type === 'pie' ? 'item' : 'axis',
 
     axisPointer: {
-      type: type === 'bar' || type === 'bar-line' ? 'shadow' : 'line',
+      type:
+        type === 'bar' || type === 'bar-line'
+          ? 'shadow'
+          : 'line',
     },
 
     backgroundColor: 'var(--wci-overlay-white-10)',
@@ -68,6 +71,9 @@ export const getChartSpecificEChartsConfig = (
     case 'area':
       return getAreaConfig(definition);
 
+    case 'bar':
+      return getBarConfig(definition);
+
     default:
       return {};
   }
@@ -93,7 +99,6 @@ export const createEChartsOptions = (
 
   return {
     ...getBaseEChartsConfig(type),
-
     ...getChartSpecificEChartsConfig(definition),
   };
 };

@@ -1,5 +1,4 @@
 
-
 export const AREA_CHART_CONFIG = {
   lineWidth: 3,
 

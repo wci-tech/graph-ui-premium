@@ -1,5 +1,4 @@
 
-
 export const AREA_CHART_CONFIG = {
   basicTension: 0,
   smoothTension: 0.4,

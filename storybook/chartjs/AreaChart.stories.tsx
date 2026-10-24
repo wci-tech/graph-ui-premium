@@ -74,7 +74,7 @@ const defaultChartWrapper = css`
 const titleH2 = css`
   font-size: 1.875rem;
   font-weight: 600;
-  color: var(--wci-text-primary);
+  color: var(--wci-black);
   margin-bottom: 12px;
   padding: 16px;
 `;
@@ -82,7 +82,7 @@ const titleH2 = css`
 const titleH3 = css`
   font-size: 1.35rem;
   font-weight: 600;
-  color: var(--wci-text-primary);
+  color: var(--wci-black);
   margin-bottom: 8px;
 `;
 
