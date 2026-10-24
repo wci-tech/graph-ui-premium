@@ -42,10 +42,20 @@ export type ChartBubbleTuple = readonly [
   value: number,
 ];
 
+export interface ChartCandlestickPoint {
+  readonly t: string | number | Date;
+  readonly o: number | string;
+  readonly h: number | string;
+  readonly l: number | string;
+  readonly c: number | string;
+  readonly v: number | string;
+}
+
 export type ChartSeriesData =
   | readonly number[]
   | readonly ChartBubblePoint[]
-  | readonly ChartBubbleTuple[];
+  | readonly ChartBubbleTuple[]
+  | readonly ChartCandlestickPoint[];
 
 export interface ChartSeriesItem {
   readonly label: string;
@@ -70,6 +80,17 @@ export type ChartColors = {
   readonly tooltipBackground?: string;
   readonly tooltipText?: string;
   readonly tooltipBorder?: string;
+};
+
+export type ChartCandlestickColors = ChartColors & {
+  readonly up?: string;
+  readonly down?: string;
+  readonly unchanged?: string;
+  readonly volumeUp?: string;
+  readonly volumeDown?: string;
+  readonly crosshair?: string;
+  readonly crosshairLabelBackground?: string;
+  readonly crosshairLabelText?: string;
 };
 
 export type DownloadPlacement =
@@ -118,11 +139,9 @@ export type ChartEffect =
   | 'line-smooth-update'
   | 'fade-in';
 
-export type ChartProps = {
-  readonly type: ChartType;
+type BaseChartProps = {
   readonly engine?: ChartEngine;
   readonly data: ChartData;
-  readonly colors?: ChartColors;
   readonly options?: ChartOptions;
   readonly appearance?: ChartAppearance;
   readonly effect?: ChartEffect;
@@ -133,6 +152,20 @@ export type ChartProps = {
   readonly className?: string;
   readonly testId?: string;
 };
+
+export type StandardChartProps = BaseChartProps & {
+  readonly type: Exclude<ChartType, 'candlestick'>;
+  readonly colors?: ChartColors;
+};
+
+export type CandlestickChartProps = BaseChartProps & {
+  readonly type: 'candlestick';
+  readonly colors?: ChartCandlestickColors;
+};
+
+export type ChartProps =
+  | StandardChartProps
+  | CandlestickChartProps;
 
 export type EngineRendererProps = ChartProps & {
   readonly resolvedEngine: ResolvedChartEngine;
