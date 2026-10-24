@@ -1,5 +1,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { toNumberSeriesData } from '@/common/utils/adaptersHelper.utils';
 import type {
   AreaChartDataset,
   AreaChartEffect,
@@ -27,7 +28,9 @@ const resolveEffect = (
 const resolveAppearance = (
   appearance: EngineRendererProps['appearance'],
 ): AreaChartProps['appearance'] =>
-  appearance === 'basic' || appearance === 'smooth' ? appearance : undefined;
+  appearance === 'basic' || appearance === 'smooth'
+    ? appearance
+    : undefined;
 
 const toAreaChartData = (
   series: EngineRendererProps['data']['series'],
@@ -35,8 +38,7 @@ const toAreaChartData = (
   series.map((seriesItem) =>
     compactObject({
       label: seriesItem.label,
-      data: Array.from(seriesItem.data),
-
+      data: toNumberSeriesData(seriesItem.data),
       color: seriesItem.color,
       pointColor: seriesItem.pointColor,
       pointRadius: seriesItem.pointRadius,

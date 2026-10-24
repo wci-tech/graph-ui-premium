@@ -4,6 +4,7 @@ import { isRecord } from '@/common/utils/Common.utils';
 import { getAreaConfig } from '@/components/echarts/components/area-chart/area.config';
 
 import { getBarConfig } from '../components/bar-chart/bar.config';
+import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -70,10 +71,10 @@ export const getChartSpecificEChartsConfig = (
   switch (definition.type) {
     case 'area':
       return getAreaConfig(definition);
-
     case 'bar':
       return getBarConfig(definition);
-
+    case 'bubble':
+      return getBubbleConfig(definition);
     default:
       return {};
   }
