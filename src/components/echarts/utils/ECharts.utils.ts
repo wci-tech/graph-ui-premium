@@ -7,6 +7,7 @@ import { getBarConfig } from '../components/bar-chart/bar.config';
 import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
+import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -37,9 +38,13 @@ export const isEChartsDefinition = (
 export const getBaseEChartsConfig = (
   type: SupportedEChartType,
 ): EChartsOption => {
-  const isItemTooltip = type === 'pie';
+  const isItemTooltip =
+    type === 'pie' ||
+    type === 'doughnut';
+
   const isShadowPointer =
-    type === 'bar' || type === 'bar-line';
+    type === 'bar' ||
+    type === 'bar-line';
 
   return {
     backgroundColor: 'transparent',
@@ -80,6 +85,8 @@ export const getChartSpecificEChartsConfig = (
       return getBubbleConfig(definition);
     case 'candlestick':
       return getCandlestickConfig(definition);
+    case 'doughnut':
+      return getDoughnutConfig(definition);
     default:
       return {};
   }
