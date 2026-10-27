@@ -9,17 +9,16 @@ import type {
   ChartEvent,
 } from 'chart.js';
 
+import type {
+  ChartJSData,
+  ChartJSOptions,
+  ChartjsProps,
+} from '@/components/chartjs/ChartJS.types';
 import type { ChartJSEffect } from '@/components/chartjs/common-effects';
 import type {
   ChartCustomStyles,
   DownloadPlacement,
 } from '@/engines/engine.types';
-
-import type {
-  ChartJSData,
-  ChartJSOptions,
-  ChartjsProps,
-} from '../../ChartJS.types';
 
 export type GanttChartEffect = ChartJSEffect;
 

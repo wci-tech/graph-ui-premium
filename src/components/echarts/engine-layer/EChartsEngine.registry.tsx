@@ -6,6 +6,7 @@ import {
   BarLineChart,
   BubbleChart,
   CandlestickChart,
+  DoughnutChart,
   GanttChart,
 } from '@/components/echarts/components';
 
@@ -14,6 +15,7 @@ import { adaptEChartsBarProps } from './adapters/bar.adapter';
 import { adaptEChartsBarLineProps } from './adapters/bar-line.adapter';
 import { adaptEChartsBubbleProps } from './adapters/bubble.adapter';
 import { adaptEChartsCandlestickProps } from './adapters/candlestick.adapter';
+import { adaptEChartsDoughnutProps } from './adapters/doughnut.adapter';
 import { adaptEChartsGanttProps } from './adapters/gantt.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
@@ -24,11 +26,11 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   bar: {
     render: (props) => <BarChart {...adaptEChartsBarProps(props)} />,
   },
-  bubble: {
-    render: (props) => <BubbleChart {...adaptEChartsBubbleProps(props)} />,
-  },
   'bar-line': {
     render: (props) => <BarLineChart {...adaptEChartsBarLineProps(props)} />,
+  },
+  bubble: {
+    render: (props) => <BubbleChart {...adaptEChartsBubbleProps(props)} />,
   },
   candlestick: {
     render: (props) => {
@@ -41,5 +43,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   gantt: {
     render: (props) => <GanttChart {...adaptEChartsGanttProps(props)} />,
+  },
+  doughnut: {
+    render: (props) => <DoughnutChart {...adaptEChartsDoughnutProps(props)} />,
   },
 };
