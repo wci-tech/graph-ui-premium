@@ -6,6 +6,7 @@ import {
   BarLineChart,
   BubbleChart,
   CandlestickChart,
+  GanttChart,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -13,6 +14,7 @@ import { adaptEChartsBarProps } from './adapters/bar.adapter';
 import { adaptEChartsBarLineProps } from './adapters/bar-line.adapter';
 import { adaptEChartsBubbleProps } from './adapters/bubble.adapter';
 import { adaptEChartsCandlestickProps } from './adapters/candlestick.adapter';
+import { adaptEChartsGanttProps } from './adapters/gantt.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -36,5 +38,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
 
       return <CandlestickChart {...adaptEChartsCandlestickProps(props)} />;
     },
+  },
+  gantt: {
+    render: (props) => <GanttChart {...adaptEChartsGanttProps(props)} />,
   },
 };

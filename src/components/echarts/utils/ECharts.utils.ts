@@ -7,13 +7,43 @@ import { getBarConfig } from '../components/bar-chart/bar.config';
 import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
+import { getGanttConfig } from '../components/gantt-chart/gantt.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
 } from '../ECharts.types';
 
 /**
+ * Supported ECharts chart types.
+ */
+const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
+  'area',
+  'bar',
+  'bar-line',
+  'bubble',
+  'candlestick',
+  'gantt',
+];
+
+/**
+ * Checks whether the supplied chart type is supported by ECharts.
+ *
+ * @param type - Chart type to validate.
+ * @returns Whether the chart type is supported.
+ */
+const isSupportedEChartType = (
+  type: unknown,
+): type is SupportedEChartType =>
+  typeof type === 'string' &&
+  SUPPORTED_ECHART_TYPES.includes(
+    type as SupportedEChartType,
+  );
+
+/**
  * Checks whether the value contains the generic ECharts definition structure.
+ *
+ * Chart-specific data validation belongs to each chart configuration.
+ * The shared validator only verifies the common chart discriminator.
  *
  * @param definition - Definition to validate.
  * @returns Whether the value is a valid ECharts definition.
@@ -25,7 +55,9 @@ export const isEChartsDefinition = (
     return false;
   }
 
-  return Array.isArray(definition['series']);
+  return isSupportedEChartType(
+    definition['type'],
+  );
 };
 
 /**
@@ -37,19 +69,31 @@ export const isEChartsDefinition = (
 export const getBaseEChartsConfig = (
   type: SupportedEChartType,
 ): EChartsOption => {
-  const isItemTooltip = type === 'pie';
+  const isItemTooltip =
+    type === 'pie';
+
   const isShadowPointer =
-    type === 'bar' || type === 'bar-line';
+    type === 'bar' ||
+    type === 'bar-line';
 
   return {
     backgroundColor: 'transparent',
     animation: true,
+
     tooltip: {
-      trigger: isItemTooltip ? 'item' : 'axis',
+      trigger: isItemTooltip
+        ? 'item'
+        : 'axis',
+
       axisPointer: {
-        type: isShadowPointer ? 'shadow' : 'line',
+        type: isShadowPointer
+          ? 'shadow'
+          : 'line',
       },
-      backgroundColor: 'var(--wci-overlay-white-10)',
+
+      backgroundColor:
+        'var(--wci-overlay-white-10)',
+
       textStyle: {
         color: 'var(--wci-black)',
       },
@@ -71,15 +115,35 @@ export const getChartSpecificEChartsConfig = (
 ): EChartsOption => {
   switch (definition.type) {
     case 'area':
-      return getAreaConfig(definition);
+      return getAreaConfig(
+        definition,
+      );
+
     case 'bar':
-      return getBarConfig(definition);
+      return getBarConfig(
+        definition,
+      );
+
     case 'bar-line':
-      return getBarLineConfig(definition);
+      return getBarLineConfig(
+        definition,
+      );
+
     case 'bubble':
-      return getBubbleConfig(definition);
+      return getBubbleConfig(
+        definition,
+      );
+
     case 'candlestick':
-      return getCandlestickConfig(definition);
+      return getCandlestickConfig(
+        definition,
+      );
+
+    case 'gantt':
+      return getGanttConfig(
+        definition,
+      );
+
     default:
       return {};
   }
@@ -101,10 +165,17 @@ export const createEChartsOptions = (
     return {};
   }
 
-  const type = definition.type ?? 'line';
+  const type = definition.type;
+
+  if (!isSupportedEChartType(type)) {
+    return {};
+  }
 
   return {
     ...getBaseEChartsConfig(type),
-    ...getChartSpecificEChartsConfig(definition),
+
+    ...getChartSpecificEChartsConfig(
+      definition,
+    ),
   };
 };

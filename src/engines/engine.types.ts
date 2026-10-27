@@ -51,11 +51,19 @@ export interface ChartCandlestickPoint {
   readonly v: number | string;
 }
 
+export interface ChartGanttTask {
+  readonly label: string;
+  readonly start: string | number | Date;
+  readonly end: string | number | Date;
+  readonly color?: string;
+}
+
 export type ChartSeriesData =
   | readonly number[]
   | readonly ChartBubblePoint[]
   | readonly ChartBubbleTuple[]
-  | readonly ChartCandlestickPoint[];
+  | readonly ChartCandlestickPoint[]
+  | readonly ChartGanttTask[];
 
 export interface ChartSeriesItem {
   readonly label: string;
