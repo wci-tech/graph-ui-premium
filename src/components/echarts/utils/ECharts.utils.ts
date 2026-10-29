@@ -10,6 +10,7 @@ import { getCandlestickConfig } from '../components/candlestick-chart/candlestic
 import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
 import { getGanttConfig } from '../components/gantt-chart/gantt.config';
 import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
+import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
 import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
 
 /**
@@ -24,6 +25,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'doughnut',
   'gantt',
   'gauge',
+  'heatmap',
 ];
 
 /**
@@ -63,22 +65,17 @@ export const isEChartsDefinition = (definition: unknown): definition is EChartsD
  */
 export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption => {
   const isItemTooltip = type === 'pie' || type === 'doughnut' || type === 'gauge';
-
   const isShadowPointer = type === 'bar' || type === 'bar-line';
 
   return {
     backgroundColor: 'transparent',
     animation: true,
-
     tooltip: {
       trigger: isItemTooltip ? 'item' : 'axis',
-
       axisPointer: {
         type: isShadowPointer ? 'shadow' : 'line',
       },
-
       backgroundColor: 'var(--wci-overlay-white-10)',
-
       textStyle: {
         color: 'var(--wci-black)',
       },
@@ -122,6 +119,9 @@ export const getChartSpecificEChartsConfig = (
 
     case 'gauge':
       return getGaugeConfig(definition);
+
+    case 'heatmap':
+      return getHeatmapConfig(definition);
 
     default:
       return {};

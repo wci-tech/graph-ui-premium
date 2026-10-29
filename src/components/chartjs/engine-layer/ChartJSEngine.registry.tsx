@@ -9,6 +9,7 @@ import {
   DoughnutChart,
   GanttChart,
   GaugeMeter,
+  HeatmapChart,
 } from '@/components/chartjs/components';
 
 import { adaptChartJSAreaProps } from './adapters/area.adapter';
@@ -19,6 +20,7 @@ import { adaptChartJSCandlestickProps } from './adapters/candlestick.adapter';
 import { adaptChartJSDoughnutProps } from './adapters/doughnut.adapter';
 import { adaptChartJSGanttProps } from './adapters/gantt.adapter';
 import { adaptChartJSGaugeMeterProps } from './adapters/gauge-meter.adapter';
+import { adaptChartJSHeatmapProps } from './adapters/heatmap.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
@@ -49,6 +51,9 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   doughnut: {
     render: (props) => <DoughnutChart {...adaptChartJSDoughnutProps(props)} />,
+  },
+  heatmap: {
+    render: (props) => <HeatmapChart {...adaptChartJSHeatmapProps(props)} />,
   },
   gauge: {
     render: (props) => <GaugeMeter {...adaptChartJSGaugeMeterProps(props)} />,

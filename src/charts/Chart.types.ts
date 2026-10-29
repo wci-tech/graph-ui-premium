@@ -1,5 +1,6 @@
 import type {
   ChartAppearance,
+  ChartColors,
   ChartCustomStyles,
   ChartEffect,
   ChartEngine,
@@ -21,6 +22,8 @@ type SharedSpecialChartProps = {
 
   readonly effect?: ChartEffect;
 
+  readonly colors?: ChartColors;
+
   readonly lazyLoadOnVisible?: boolean;
 
   readonly showDownload?: boolean;
@@ -38,7 +41,7 @@ type SharedSpecialChartProps = {
 /* Heatmap                                                                     */
 /* -------------------------------------------------------------------------- */
 
-type SharedChartJSHeatmapPoint = {
+export type SharedHeatmapPoint = {
   readonly x: string;
 
   readonly y: string;
@@ -47,16 +50,6 @@ type SharedChartJSHeatmapPoint = {
 
   readonly color?: string;
 };
-
-type SharedEChartsHeatmapPoint = readonly [
-  number,
-  number,
-  number,
-];
-
-type SharedHeatmapPoint =
-  | SharedChartJSHeatmapPoint
-  | SharedEChartsHeatmapPoint;
 
 type SharedHeatmapSeries = {
   readonly label: string;
@@ -69,23 +62,18 @@ type SharedHeatmapSeries = {
 type SharedHeatmapData = {
   readonly labels: readonly string[];
 
-  readonly xLabels?: readonly string[];
-
-  readonly yLabels?: readonly string[];
-
   readonly series: readonly SharedHeatmapSeries[];
 
   readonly type?: string;
 };
 
-export type SharedHeatmapChartProps =
-  SharedSpecialChartProps & {
-    readonly type: 'heatmap';
+export type SharedHeatmapChartProps = SharedSpecialChartProps & {
+  readonly type: 'heatmap';
 
-    readonly data: SharedHeatmapData;
+  readonly data: SharedHeatmapData;
 
-    readonly options?: ChartOptions;
-  };
+  readonly options?: ChartOptions;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Network                                                                     */
@@ -165,18 +153,15 @@ type SharedChart2NetworkData = {
   readonly type?: string;
 };
 
-type SharedNetworkData =
-  | SharedChart1NetworkData
-  | SharedChart2NetworkData;
+type SharedNetworkData = SharedChart1NetworkData | SharedChart2NetworkData;
 
-export type SharedNetworkChartProps =
-  SharedSpecialChartProps & {
-    readonly type: 'network';
+export type SharedNetworkChartProps = SharedSpecialChartProps & {
+  readonly type: 'network';
 
-    readonly data: SharedNetworkData;
+  readonly data: SharedNetworkData;
 
-    readonly options?: ChartOptions;
-  };
+  readonly options?: ChartOptions;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Scatter                                                                     */
@@ -212,10 +197,7 @@ export type Chart1ScatterData = {
 /* Chart 2 Scatter                                                             */
 /* -------------------------------------------------------------------------- */
 
-export type Chart2ScatterPoint = readonly [
-  number,
-  number,
-];
+export type Chart2ScatterPoint = readonly [number, number];
 
 export type Chart2ScatterSeries = {
   readonly label: string;
@@ -237,18 +219,15 @@ export type Chart2ScatterData = {
 /* Shared Scatter                                                              */
 /* -------------------------------------------------------------------------- */
 
-export type SharedScatterData =
-  | Chart1ScatterData
-  | Chart2ScatterData;
+export type SharedScatterData = Chart1ScatterData | Chart2ScatterData;
 
-export type SharedScatterChartProps =
-  SharedSpecialChartProps & {
-    readonly type: 'scatter';
+export type SharedScatterChartProps = SharedSpecialChartProps & {
+  readonly type: 'scatter';
 
-    readonly data: SharedScatterData;
+  readonly data: SharedScatterData;
 
-    readonly options?: ChartOptions;
-  };
+  readonly options?: ChartOptions;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Engine-managed charts                                                       */
@@ -263,11 +242,7 @@ export type SharedScatterChartProps =
 export type SharedEngineChartProps = Exclude<
   EngineChartProps,
   {
-    readonly type:
-    | 'heatmap'
-    | 'network'
-    | 'scatter'
-    | 'sunburst';
+    readonly type: 'heatmap' | 'network' | 'scatter' | 'sunburst';
   }
 >;
 
