@@ -4,3 +4,7 @@ export { BarLineChart } from './bar-line-chart'
 export { BubbleChart } from './bubble-chart'
 export { CandlestickChart } from './candlestick-chart'
 export { DoughnutChart } from './doughnut-chart';
+export { GanttChart } from './gantt-chart'
+export { GaugeMeter } from './gauge-meter';
+export { HeatmapChart } from './heatmap-chart';
+export { PieChart } from './pie-chart';

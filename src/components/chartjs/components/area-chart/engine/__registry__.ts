@@ -8,33 +8,38 @@ const effectLoaders: Partial<
   Record<Exclude<AreaChartEffect, 'none'>, () => Promise<AreaChartRegistryEntry>>
 > = {
   bounce: () =>
-    import('../../../common-effects/BounceChartJSEffect.styles').then((module) => module.default),
+    import('@/components/chartjs/common-effects/BounceChartJSEffect.styles').then(
+      (module) => module.default,
+    ),
 
   wobble: () =>
-    import('../../../common-effects/WobbleChartJSEffect.styles').then((module) => module.default),
+    import('@/components/chartjs/common-effects/WobbleChartJSEffect.styles').then(
+      (module) => module.default,
+    ),
 
   elastic: () =>
-    import('../../../common-effects/ElasticChartJSEffect.styles').then((module) => module.default),
+    import('@/components/chartjs/common-effects/ElasticChartJSEffect.styles').then(
+      (module) => module.default,
+    ),
 
   'progressive-trace': () =>
-    import('../../../common-effects/ProgressiveTraceChartJSEffect.styles').then(
+    import('@/components/chartjs/common-effects/ProgressiveTraceChartJSEffect.styles').then(
       (module) => module.default,
     ),
 
   'elastic-glide': () =>
-    import('../../../common-effects/ElasticGlideChartJSEffect.styles').then(
+    import('@/components/chartjs/common-effects/ElasticGlideChartJSEffect.styles').then(
       (module) => module.default,
     ),
 
   'staggered-reveal': () =>
-    import('../../../common-effects/StaggeredRevealChartJSEffect.styles').then(
+    import('@/components/chartjs/common-effects/StaggeredRevealChartJSEffect.styles').then(
       (module) => module.default,
     ),
 };
 
 export const getComponent = createRegistry<AreaChartRegistryKey, AreaChartRegistryEntry>({
   eager: {},
-
   lazy: {
     ...effectLoaders,
   },
