@@ -2,17 +2,16 @@ import type { ReactNode, RefObject } from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
 
+import type {
+  ChartJSData,
+  ChartJSOptions,
+  ChartjsProps,
+} from '@/components/chartjs/ChartJS.types';
 import type { ChartJSEffect } from '@/components/chartjs/common-effects';
 import type {
   ChartCustomStyles,
   DownloadPlacement,
 } from '@/engines/engine.types';
-
-import type {
-  ChartJSData,
-  ChartJSOptions,
-  ChartjsProps,
-} from '../../ChartJS.types';
 
 export type BarLineChartEffect = ChartJSEffect;
 

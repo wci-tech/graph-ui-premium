@@ -8,13 +8,39 @@ import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
 import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
+import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
 } from '../ECharts.types';
 
+const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
+  'area',
+  'bar',
+  'bar-line',
+  'bubble',
+  'candlestick',
+  'doughnut',
+  'gauge',
+];
+
 /**
- * Checks whether the value contains the generic ECharts definition structure.
+ * Checks whether the value is a supported ECharts chart type.
+ *
+ * @param type - Chart type to validate.
+ * @returns Whether the value is a supported ECharts chart type.
+ */
+const isSupportedEChartType = (
+  type: unknown,
+): type is SupportedEChartType =>
+  typeof type === 'string' &&
+  SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
+
+/**
+ * Checks whether the value contains a valid ECharts definition.
+ *
+ * Each chart owns its definition structure, so validation is based on
+ * the supported chart type instead of a shared series property.
  *
  * @param definition - Definition to validate.
  * @returns Whether the value is a valid ECharts definition.
@@ -26,7 +52,7 @@ export const isEChartsDefinition = (
     return false;
   }
 
-  return Array.isArray(definition['series']);
+  return isSupportedEChartType(definition['type']);
 };
 
 /**
@@ -40,7 +66,8 @@ export const getBaseEChartsConfig = (
 ): EChartsOption => {
   const isItemTooltip =
     type === 'pie' ||
-    type === 'doughnut';
+    type === 'doughnut' ||
+    type === 'gauge';
 
   const isShadowPointer =
     type === 'bar' ||
@@ -87,6 +114,8 @@ export const getChartSpecificEChartsConfig = (
       return getCandlestickConfig(definition);
     case 'doughnut':
       return getDoughnutConfig(definition);
+    case 'gauge':
+      return getGaugeConfig(definition);
     default:
       return {};
   }
