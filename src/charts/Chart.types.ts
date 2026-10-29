@@ -1,6 +1,6 @@
-
 import type {
   ChartAppearance,
+  ChartColors,
   ChartCustomStyles,
   ChartEffect,
   ChartEngine,
@@ -21,6 +21,8 @@ type SharedSpecialChartProps = {
   readonly appearance?: ChartAppearance;
 
   readonly effect?: ChartEffect;
+
+  readonly colors?: ChartColors;
 
   readonly lazyLoadOnVisible?: boolean;
 
@@ -77,7 +79,7 @@ export type SharedGanttChartProps = SharedSpecialChartProps & {
 /* Heatmap                                                                     */
 /* -------------------------------------------------------------------------- */
 
-type SharedChartJSHeatmapPoint = {
+export type SharedHeatmapPoint = {
   readonly x: string;
 
   readonly y: string;
@@ -86,10 +88,6 @@ type SharedChartJSHeatmapPoint = {
 
   readonly color?: string;
 };
-
-type SharedEChartsHeatmapPoint = readonly [number, number, number];
-
-type SharedHeatmapPoint = SharedChartJSHeatmapPoint | SharedEChartsHeatmapPoint;
 
 type SharedHeatmapSeries = {
   readonly label: string;
@@ -101,10 +99,6 @@ type SharedHeatmapSeries = {
 
 type SharedHeatmapData = {
   readonly labels: readonly string[];
-
-  readonly xLabels?: readonly string[];
-
-  readonly yLabels?: readonly string[];
 
   readonly series: readonly SharedHeatmapSeries[];
 
@@ -301,6 +295,7 @@ export type ChartProps =
 
 export type {
   ChartAppearance,
+  ChartColors,
   ChartCustomStyles,
   ChartData,
   ChartEffect,

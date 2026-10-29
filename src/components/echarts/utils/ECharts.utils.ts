@@ -8,6 +8,7 @@ import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
 import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
+import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -87,6 +88,8 @@ export const getChartSpecificEChartsConfig = (
       return getCandlestickConfig(definition);
     case 'doughnut':
       return getDoughnutConfig(definition);
+    case 'heatmap':
+      return getHeatmapConfig(definition);
     default:
       return {};
   }

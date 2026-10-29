@@ -7,6 +7,7 @@ import {
   BubbleChart,
   CandlestickChart,
   DoughnutChart,
+  HeatmapChart,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -15,6 +16,7 @@ import { adaptEChartsBarLineProps } from './adapters/bar-line.adapter';
 import { adaptEChartsBubbleProps } from './adapters/bubble.adapter';
 import { adaptEChartsCandlestickProps } from './adapters/candlestick.adapter';
 import { adaptEChartsDoughnutProps } from './adapters/doughnut.adapter';
+import { adaptEChartsHeatmapProps } from './adapters/heatmap.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -41,5 +43,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   doughnut: {
     render: (props) => <DoughnutChart {...adaptEChartsDoughnutProps(props)} />,
+  },
+  heatmap: {
+    render: (props) => <HeatmapChart {...adaptEChartsHeatmapProps(props)} />,
   },
 };
