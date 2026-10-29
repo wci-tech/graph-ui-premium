@@ -7,6 +7,7 @@ import {
   BubbleChart,
   CandlestickChart,
   DoughnutChart,
+  GanttChart,
   GaugeMeter,
 } from '@/components/chartjs/components';
 
@@ -16,6 +17,7 @@ import { adaptChartJSBarLineProps } from './adapters/bar-line.adapter';
 import { adaptChartJSBubbleProps } from './adapters/bubble.adapter';
 import { adaptChartJSCandlestickProps } from './adapters/candlestick.adapter';
 import { adaptChartJSDoughnutProps } from './adapters/doughnut.adapter';
+import { adaptChartJSGanttProps } from './adapters/gantt.adapter';
 import { adaptChartJSGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
@@ -40,6 +42,10 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
 
       return <CandlestickChart {...adaptChartJSCandlestickProps(props)} />;
     },
+  },
+
+  gantt: {
+    render: (props) => <GanttChart {...adaptChartJSGanttProps(props)} />,
   },
   doughnut: {
     render: (props) => <DoughnutChart {...adaptChartJSDoughnutProps(props)} />,

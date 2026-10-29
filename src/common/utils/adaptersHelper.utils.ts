@@ -2,6 +2,7 @@ import type {
     ChartBubblePoint,
     ChartBubbleTuple,
     ChartCandlestickPoint,
+    ChartGanttTask,
     ChartSeriesData,
 } from '@/engines/engine.types';
 
@@ -54,19 +55,62 @@ export const isCandlestickPoint = (
     const timestamp = point['t'];
 
     return (
-        (typeof timestamp === 'string' ||
+        (
+            typeof timestamp === 'string' ||
             typeof timestamp === 'number' ||
-            timestamp instanceof Date) &&
-        (typeof point['o'] === 'number' ||
-            typeof point['o'] === 'string') &&
-        (typeof point['h'] === 'number' ||
-            typeof point['h'] === 'string') &&
-        (typeof point['l'] === 'number' ||
-            typeof point['l'] === 'string') &&
-        (typeof point['c'] === 'number' ||
-            typeof point['c'] === 'string') &&
-        (typeof point['v'] === 'number' ||
-            typeof point['v'] === 'string')
+            timestamp instanceof Date
+        ) &&
+        (
+            typeof point['o'] === 'number' ||
+            typeof point['o'] === 'string'
+        ) &&
+        (
+            typeof point['h'] === 'number' ||
+            typeof point['h'] === 'string'
+        ) &&
+        (
+            typeof point['l'] === 'number' ||
+            typeof point['l'] === 'string'
+        ) &&
+        (
+            typeof point['c'] === 'number' ||
+            typeof point['c'] === 'string'
+        ) &&
+        (
+            typeof point['v'] === 'number' ||
+            typeof point['v'] === 'string'
+        )
+    );
+};
+
+const isGanttDateValue = (
+    value: unknown,
+): value is string | number | Date =>
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    value instanceof Date;
+
+export const isGanttTask = (
+    value: unknown,
+): value is ChartGanttTask => {
+    if (
+        typeof value !== 'object' ||
+        value === null ||
+        Array.isArray(value)
+    ) {
+        return false;
+    }
+
+    const task = value as Record<string, unknown>;
+
+    return (
+        typeof task['label'] === 'string' &&
+        isGanttDateValue(task['start']) &&
+        isGanttDateValue(task['end']) &&
+        (
+            task['color'] === undefined ||
+            typeof task['color'] === 'string'
+        )
     );
 };
 
@@ -84,6 +128,11 @@ export const isCandlestickSeriesData = (
     data: ChartSeriesData,
 ): data is readonly ChartCandlestickPoint[] =>
     data.every(isCandlestickPoint);
+
+export const isGanttSeriesData = (
+    data: ChartSeriesData,
+): data is readonly ChartGanttTask[] =>
+    data.every(isGanttTask);
 
 export const toNumberSeriesData = (
     data: ChartSeriesData,
@@ -121,7 +170,9 @@ export const toBubbleTupleSeriesData = (
     }
 
     if (isBubblePointSeriesData(data)) {
-        return data.map(({ x, y, r }) => [x, y, r]);
+        return data.map(
+            ({ x, y, r }) => [x, y, r],
+        );
     }
 
     return [];
@@ -131,6 +182,16 @@ export const toCandlestickSeriesData = (
     data: ChartSeriesData,
 ): ChartCandlestickPoint[] => {
     if (!isCandlestickSeriesData(data)) {
+        return [];
+    }
+
+    return Array.from(data);
+};
+
+export const toGanttSeriesData = (
+    data: ChartSeriesData,
+): ChartGanttTask[] => {
+    if (!isGanttSeriesData(data)) {
         return [];
     }
 

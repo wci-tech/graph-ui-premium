@@ -1,11 +1,10 @@
-
 import type {
   ChartAppearance,
   ChartCustomStyles,
   ChartEffect,
   ChartEngine,
   ChartOptions,
-  ChartProps as StandardChartProps,
+  ChartProps as EngineChartProps,
   DownloadPlacement,
 } from '@/engines/engine.types';
 
@@ -36,44 +35,6 @@ type SharedSpecialChartProps = {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Gantt                                                                       */
-/* -------------------------------------------------------------------------- */
-
-type SharedGanttTask = {
-  readonly label: string;
-
-  readonly start: string | number | Date;
-
-  readonly end: string | number | Date;
-
-  readonly color?: string;
-};
-
-type SharedGanttSeries = {
-  readonly label: string;
-
-  readonly data: readonly SharedGanttTask[];
-
-  readonly color?: string;
-};
-
-type SharedGanttData = {
-  readonly labels: readonly string[];
-
-  readonly series: readonly SharedGanttSeries[];
-
-  readonly type?: string;
-};
-
-export type SharedGanttChartProps = SharedSpecialChartProps & {
-  readonly type: 'gantt';
-
-  readonly data: SharedGanttData;
-
-  readonly options?: ChartOptions;
-};
-
-/* -------------------------------------------------------------------------- */
 /* Heatmap                                                                     */
 /* -------------------------------------------------------------------------- */
 
@@ -87,9 +48,15 @@ type SharedChartJSHeatmapPoint = {
   readonly color?: string;
 };
 
-type SharedEChartsHeatmapPoint = readonly [number, number, number];
+type SharedEChartsHeatmapPoint = readonly [
+  number,
+  number,
+  number,
+];
 
-type SharedHeatmapPoint = SharedChartJSHeatmapPoint | SharedEChartsHeatmapPoint;
+type SharedHeatmapPoint =
+  | SharedChartJSHeatmapPoint
+  | SharedEChartsHeatmapPoint;
 
 type SharedHeatmapSeries = {
   readonly label: string;
@@ -111,13 +78,14 @@ type SharedHeatmapData = {
   readonly type?: string;
 };
 
-export type SharedHeatmapChartProps = SharedSpecialChartProps & {
-  readonly type: 'heatmap';
+export type SharedHeatmapChartProps =
+  SharedSpecialChartProps & {
+    readonly type: 'heatmap';
 
-  readonly data: SharedHeatmapData;
+    readonly data: SharedHeatmapData;
 
-  readonly options?: ChartOptions;
-};
+    readonly options?: ChartOptions;
+  };
 
 /* -------------------------------------------------------------------------- */
 /* Network                                                                     */
@@ -197,15 +165,18 @@ type SharedChart2NetworkData = {
   readonly type?: string;
 };
 
-type SharedNetworkData = SharedChart1NetworkData | SharedChart2NetworkData;
+type SharedNetworkData =
+  | SharedChart1NetworkData
+  | SharedChart2NetworkData;
 
-export type SharedNetworkChartProps = SharedSpecialChartProps & {
-  readonly type: 'network';
+export type SharedNetworkChartProps =
+  SharedSpecialChartProps & {
+    readonly type: 'network';
 
-  readonly data: SharedNetworkData;
+    readonly data: SharedNetworkData;
 
-  readonly options?: ChartOptions;
-};
+    readonly options?: ChartOptions;
+  };
 
 /* -------------------------------------------------------------------------- */
 /* Scatter                                                                     */
@@ -241,7 +212,10 @@ export type Chart1ScatterData = {
 /* Chart 2 Scatter                                                             */
 /* -------------------------------------------------------------------------- */
 
-export type Chart2ScatterPoint = readonly [number, number];
+export type Chart2ScatterPoint = readonly [
+  number,
+  number,
+];
 
 export type Chart2ScatterSeries = {
   readonly label: string;
@@ -263,34 +237,46 @@ export type Chart2ScatterData = {
 /* Shared Scatter                                                              */
 /* -------------------------------------------------------------------------- */
 
-export type SharedScatterData = Chart1ScatterData | Chart2ScatterData;
+export type SharedScatterData =
+  | Chart1ScatterData
+  | Chart2ScatterData;
 
-export type SharedScatterChartProps = SharedSpecialChartProps & {
-  readonly type: 'scatter';
+export type SharedScatterChartProps =
+  SharedSpecialChartProps & {
+    readonly type: 'scatter';
 
-  readonly data: SharedScatterData;
+    readonly data: SharedScatterData;
 
-  readonly options?: ChartOptions;
-};
+    readonly options?: ChartOptions;
+  };
 
 /* -------------------------------------------------------------------------- */
-/* Standard numeric charts                                                     */
+/* Engine-managed charts                                                       */
 /* -------------------------------------------------------------------------- */
 
-export type SharedStandardChartProps = Omit<StandardChartProps, 'type'> & {
-  readonly type: Exclude<
-    StandardChartProps['type'],
-    'gantt' | 'heatmap' | 'network' | 'scatter' | 'sunburst'
-  >;
-};
+/**
+ * Charts that already use the normalized engine data contract.
+ *
+ * Their data, colors, options, appearance, effects, and common props
+ * are defined by the engine layer and should not be duplicated here.
+ */
+export type SharedEngineChartProps = Exclude<
+  EngineChartProps,
+  {
+    readonly type:
+    | 'heatmap'
+    | 'network'
+    | 'scatter'
+    | 'sunburst';
+  }
+>;
 
 /* -------------------------------------------------------------------------- */
 /* Public Chart props                                                          */
 /* -------------------------------------------------------------------------- */
 
 export type ChartProps =
-  | SharedStandardChartProps
-  | SharedGanttChartProps
+  | SharedEngineChartProps
   | SharedHeatmapChartProps
   | SharedNetworkChartProps
   | SharedScatterChartProps;
@@ -301,6 +287,8 @@ export type ChartProps =
 
 export type {
   ChartAppearance,
+  ChartCandlestickColors,
+  ChartColors,
   ChartCustomStyles,
   ChartData,
   ChartEffect,

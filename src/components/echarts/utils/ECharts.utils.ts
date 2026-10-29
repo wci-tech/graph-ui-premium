@@ -8,12 +8,13 @@ import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
 import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
 import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
+import { getGanttConfig } from '../components/gantt-chart/gantt.config';
 import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
-import type {
-  EChartsDefinition,
-  SupportedEChartType,
-} from '../ECharts.types';
+import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
 
+/**
+ * Supported ECharts chart types.
+ */
 const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'area',
   'bar',
@@ -21,6 +22,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'bubble',
   'candlestick',
   'doughnut',
+  'gantt',
   'gauge',
 ];
 
@@ -30,11 +32,8 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
  * @param type - Chart type to validate.
  * @returns Whether the value is a supported ECharts chart type.
  */
-const isSupportedEChartType = (
-  type: unknown,
-): type is SupportedEChartType =>
-  typeof type === 'string' &&
-  SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
+const isSupportedEChartType = (type: unknown): type is SupportedEChartType =>
+  typeof type === 'string' && SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
 
 /**
  * Checks whether the value contains a valid ECharts definition.
@@ -42,12 +41,13 @@ const isSupportedEChartType = (
  * Each chart owns its definition structure, so validation is based on
  * the supported chart type instead of a shared series property.
  *
+ * Chart-specific data validation belongs to each chart configuration.
+ * The shared validator only verifies the common chart discriminator.
+ *
  * @param definition - Definition to validate.
  * @returns Whether the value is a valid ECharts definition.
  */
-export const isEChartsDefinition = (
-  definition: unknown,
-): definition is EChartsDefinition => {
+export const isEChartsDefinition = (definition: unknown): definition is EChartsDefinition => {
   if (!isRecord(definition)) {
     return false;
   }
@@ -61,27 +61,24 @@ export const isEChartsDefinition = (
  * @param type - Supported ECharts chart type.
  * @returns Base ECharts configuration.
  */
-export const getBaseEChartsConfig = (
-  type: SupportedEChartType,
-): EChartsOption => {
-  const isItemTooltip =
-    type === 'pie' ||
-    type === 'doughnut' ||
-    type === 'gauge';
+export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption => {
+  const isItemTooltip = type === 'pie' || type === 'doughnut' || type === 'gauge';
 
-  const isShadowPointer =
-    type === 'bar' ||
-    type === 'bar-line';
+  const isShadowPointer = type === 'bar' || type === 'bar-line';
 
   return {
     backgroundColor: 'transparent',
     animation: true,
+
     tooltip: {
       trigger: isItemTooltip ? 'item' : 'axis',
+
       axisPointer: {
         type: isShadowPointer ? 'shadow' : 'line',
       },
+
       backgroundColor: 'var(--wci-overlay-white-10)',
+
       textStyle: {
         color: 'var(--wci-black)',
       },
@@ -104,18 +101,28 @@ export const getChartSpecificEChartsConfig = (
   switch (definition.type) {
     case 'area':
       return getAreaConfig(definition);
+
     case 'bar':
       return getBarConfig(definition);
+
     case 'bar-line':
       return getBarLineConfig(definition);
+
     case 'bubble':
       return getBubbleConfig(definition);
+
     case 'candlestick':
       return getCandlestickConfig(definition);
+
     case 'doughnut':
       return getDoughnutConfig(definition);
+
+    case 'gantt':
+      return getGanttConfig(definition);
+
     case 'gauge':
       return getGaugeConfig(definition);
+
     default:
       return {};
   }
@@ -130,14 +137,16 @@ export const getChartSpecificEChartsConfig = (
  * @param definition - Chart definition to convert.
  * @returns Complete ECharts option configuration.
  */
-export const createEChartsOptions = (
-  definition: unknown,
-): EChartsOption => {
+export const createEChartsOptions = (definition: unknown): EChartsOption => {
   if (!isEChartsDefinition(definition)) {
     return {};
   }
 
-  const type = definition.type ?? 'line';
+  const type = definition.type;
+
+  if (!isSupportedEChartType(type)) {
+    return {};
+  }
 
   return {
     ...getBaseEChartsConfig(type),
