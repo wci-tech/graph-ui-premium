@@ -14,27 +14,27 @@ const effectLoaders: Partial<
   >
 > = {
   bounce: () =>
-    import('../../../common-effects/BounceEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/BounceEChartsEffect.styles').then(
       (module) => module.default,
     ),
   wobble: () =>
-    import('../../../common-effects/WobbleEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/WobbleEChartsEffect.styles').then(
       (module) => module.default,
     ),
   elastic: () =>
-    import('../../../common-effects/ElasticEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/ElasticEChartsEffect.styles').then(
       (module) => module.default,
     ),
   'progressive-trace': () =>
-    import('../../../common-effects/ProgressiveTraceEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/ProgressiveTraceEChartsEffect.styles').then(
       (module) => module.default,
     ),
   'elastic-glide': () =>
-    import('../../../common-effects/ElasticGlideEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/ElasticGlideEChartsEffect.styles').then(
       (module) => module.default,
     ),
   'staggered-reveal': () =>
-    import('../../../common-effects/StaggeredRevealEChartsEffect.styles').then(
+    import('@/components/echarts/common-effects/StaggeredRevealEChartsEffect.styles').then(
       (module) => module.default,
     ),
 };
