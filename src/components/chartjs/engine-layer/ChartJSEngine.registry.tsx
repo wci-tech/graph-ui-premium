@@ -10,6 +10,7 @@ import {
   GanttChart,
   GaugeMeter,
   HeatmapChart,
+  PieChart,
 } from '@/components/chartjs/components';
 
 import { adaptChartJSAreaProps } from './adapters/area.adapter';
@@ -21,6 +22,7 @@ import { adaptChartJSDoughnutProps } from './adapters/doughnut.adapter';
 import { adaptChartJSGanttProps } from './adapters/gantt.adapter';
 import { adaptChartJSGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import { adaptChartJSHeatmapProps } from './adapters/heatmap.adapter';
+import { adaptChartJSPieProps } from './adapters/pieChart.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
@@ -57,5 +59,8 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   gauge: {
     render: (props) => <GaugeMeter {...adaptChartJSGaugeMeterProps(props)} />,
+  },
+  pie: {
+    render: (props) => <PieChart {...adaptChartJSPieProps(props)} />,
   },
 };

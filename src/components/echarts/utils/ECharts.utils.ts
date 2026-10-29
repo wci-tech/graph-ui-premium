@@ -11,6 +11,7 @@ import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config'
 import { getGanttConfig } from '../components/gantt-chart/gantt.config';
 import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
 import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
+import { getPieConfig } from '../components/pie-chart/pie.config';
 import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
 
 /**
@@ -26,6 +27,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'gantt',
   'gauge',
   'heatmap',
+  'pie',
 ];
 
 /**
@@ -122,6 +124,9 @@ export const getChartSpecificEChartsConfig = (
 
     case 'heatmap':
       return getHeatmapConfig(definition);
+
+    case 'pie':
+      return getPieConfig(definition);
 
     default:
       return {};
