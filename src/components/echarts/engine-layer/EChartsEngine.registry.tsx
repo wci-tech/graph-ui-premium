@@ -8,6 +8,7 @@ import {
   CandlestickChart,
   DoughnutChart,
   GanttChart,
+  GaugeMeter,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -17,6 +18,7 @@ import { adaptEChartsBubbleProps } from './adapters/bubble.adapter';
 import { adaptEChartsCandlestickProps } from './adapters/candlestick.adapter';
 import { adaptEChartsDoughnutProps } from './adapters/doughnut.adapter';
 import { adaptEChartsGanttProps } from './adapters/gantt.adapter';
+import { adaptEChartsGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -46,5 +48,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   doughnut: {
     render: (props) => <DoughnutChart {...adaptEChartsDoughnutProps(props)} />,
+  },
+  gauge: {
+    render: (props) => <GaugeMeter {...adaptEChartsGaugeMeterProps(props)} />,
   },
 };
