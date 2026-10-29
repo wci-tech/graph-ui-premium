@@ -5,7 +5,7 @@ import type {
   ChartEffect,
   ChartEngine,
   ChartOptions,
-  ChartProps as StandardChartProps,
+  ChartProps as EngineChartProps,
   DownloadPlacement,
 } from '@/engines/engine.types';
 
@@ -35,44 +35,6 @@ type SharedSpecialChartProps = {
   readonly className?: string;
 
   readonly testId?: string;
-};
-
-/* -------------------------------------------------------------------------- */
-/* Gantt                                                                       */
-/* -------------------------------------------------------------------------- */
-
-type SharedGanttTask = {
-  readonly label: string;
-
-  readonly start: string | number | Date;
-
-  readonly end: string | number | Date;
-
-  readonly color?: string;
-};
-
-type SharedGanttSeries = {
-  readonly label: string;
-
-  readonly data: readonly SharedGanttTask[];
-
-  readonly color?: string;
-};
-
-type SharedGanttData = {
-  readonly labels: readonly string[];
-
-  readonly series: readonly SharedGanttSeries[];
-
-  readonly type?: string;
-};
-
-export type SharedGanttChartProps = SharedSpecialChartProps & {
-  readonly type: 'gantt';
-
-  readonly data: SharedGanttData;
-
-  readonly options?: ChartOptions;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -268,23 +230,28 @@ export type SharedScatterChartProps = SharedSpecialChartProps & {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Standard numeric charts                                                     */
+/* Engine-managed charts                                                       */
 /* -------------------------------------------------------------------------- */
 
-export type SharedStandardChartProps = Omit<StandardChartProps, 'type'> & {
-  readonly type: Exclude<
-    StandardChartProps['type'],
-    'gantt' | 'heatmap' | 'network' | 'scatter' | 'sunburst'
-  >;
-};
+/**
+ * Charts that already use the normalized engine data contract.
+ *
+ * Their data, colors, options, appearance, effects, and common props
+ * are defined by the engine layer and should not be duplicated here.
+ */
+export type SharedEngineChartProps = Exclude<
+  EngineChartProps,
+  {
+    readonly type: 'heatmap' | 'network' | 'scatter' | 'sunburst';
+  }
+>;
 
 /* -------------------------------------------------------------------------- */
 /* Public Chart props                                                          */
 /* -------------------------------------------------------------------------- */
 
 export type ChartProps =
-  | SharedStandardChartProps
-  | SharedGanttChartProps
+  | SharedEngineChartProps
   | SharedHeatmapChartProps
   | SharedNetworkChartProps
   | SharedScatterChartProps;
@@ -295,6 +262,7 @@ export type ChartProps =
 
 export type {
   ChartAppearance,
+  ChartCandlestickColors,
   ChartColors,
   ChartCustomStyles,
   ChartData,

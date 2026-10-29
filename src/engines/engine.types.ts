@@ -51,6 +51,13 @@ export interface ChartCandlestickPoint {
   readonly v: number | string;
 }
 
+export interface ChartGanttTask {
+  readonly label: string;
+  readonly start: string | number | Date;
+  readonly end: string | number | Date;
+  readonly color?: string;
+}
+
 export interface ChartHeatmapPoint {
   readonly x: string;
   readonly y: string;
@@ -63,6 +70,7 @@ export type ChartSeriesData =
   | readonly ChartBubblePoint[]
   | readonly ChartBubbleTuple[]
   | readonly ChartCandlestickPoint[]
+  | readonly ChartGanttTask[]
   | readonly ChartHeatmapPoint[];
 
 export interface ChartSeriesItem {
