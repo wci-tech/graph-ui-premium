@@ -12,6 +12,7 @@ import { getGanttConfig } from '../components/gantt-chart/gantt.config';
 import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
 import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
 import { getPieConfig } from '../components/pie-chart/pie.config';
+import { getRadarConfig } from '../components/radar-chart/radar.config';
 import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
 
 /**
@@ -28,6 +29,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'gauge',
   'heatmap',
   'pie',
+  'radar'
 ];
 
 /**
@@ -128,6 +130,8 @@ export const getChartSpecificEChartsConfig = (
     case 'pie':
       return getPieConfig(definition);
 
+    case 'radar':
+      return getRadarConfig(definition);
     default:
       return {};
   }
