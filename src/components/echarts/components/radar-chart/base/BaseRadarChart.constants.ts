@@ -1,0 +1,20 @@
+export const RADAR_CHART_CONFIG = {
+    radius: '75%',
+    center: ['50%', '48%'] as const,
+    splitNumber: 5,
+    minimumMaxValue: 100,
+    maxValueScale: 1.1,
+    lineWidth: 2,
+    areaOpacity: 0.24,
+    pointSize: 10,
+    pointHoverScale: 1.35,
+    haloRadius: 10,
+    haloOpacity: 0.3,
+    animationDuration: 1800,
+    legend: {
+        bottom: 0,
+        itemWidth: 14,
+        itemHeight: 10,
+        itemGap: 20,
+    },
+} as const;
