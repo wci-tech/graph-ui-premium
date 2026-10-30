@@ -13,6 +13,8 @@ import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
 import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
 import { getPieConfig } from '../components/pie-chart/pie.config';
 import { getRadarConfig } from '../components/radar-chart/radar.config';
+import type { ScatterChartDefinition } from '../components/scatter-chart/base/BaseScatterChart.utils';
+import { getScatterConfig } from '../components/scatter-chart/scatter.config';
 import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
 
 /**
@@ -29,7 +31,8 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'gauge',
   'heatmap',
   'pie',
-  'radar'
+  'radar',
+  'scatter',
 ];
 
 /**
@@ -39,7 +42,8 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
  * @returns Whether the value is a supported ECharts chart type.
  */
 const isSupportedEChartType = (type: unknown): type is SupportedEChartType =>
-  typeof type === 'string' && SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
+  typeof type === 'string' &&
+  SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
 
 /**
  * Checks whether the value contains a valid ECharts definition.
@@ -53,7 +57,9 @@ const isSupportedEChartType = (type: unknown): type is SupportedEChartType =>
  * @param definition - Definition to validate.
  * @returns Whether the value is a valid ECharts definition.
  */
-export const isEChartsDefinition = (definition: unknown): definition is EChartsDefinition => {
+export const isEChartsDefinition = (
+  definition: unknown,
+): definition is EChartsDefinition => {
   if (!isRecord(definition)) {
     return false;
   }
@@ -62,14 +68,45 @@ export const isEChartsDefinition = (definition: unknown): definition is EChartsD
 };
 
 /**
+ * Checks whether the definition contains Scatter Chart-specific data.
+ *
+ * Scatter Chart uses tuple-based series data that is intentionally owned
+ * by the Scatter Chart definition rather than the shared series definition.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Scatter Chart definition.
+ */
+const isScatterChartDefinition = (
+  definition: unknown,
+): definition is ScatterChartDefinition => {
+  if (!isRecord(definition) || definition['type'] !== 'scatter') {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['series']) &&
+    isRecord(definition['scatterChartColors'])
+  );
+};
+
+/**
  * Creates the base ECharts configuration shared by all supported chart types.
  *
  * @param type - Supported ECharts chart type.
  * @returns Base ECharts configuration.
  */
-export const getBaseEChartsConfig = (type: SupportedEChartType): EChartsOption => {
-  const isItemTooltip = type === 'pie' || type === 'doughnut' || type === 'gauge';
-  const isShadowPointer = type === 'bar' || type === 'bar-line';
+export const getBaseEChartsConfig = (
+  type: SupportedEChartType,
+): EChartsOption => {
+  const isItemTooltip =
+    type === 'pie' ||
+    type === 'doughnut' ||
+    type === 'gauge' ||
+    type === 'scatter';
+
+  const isShadowPointer =
+    type === 'bar' ||
+    type === 'bar-line';
 
   return {
     backgroundColor: 'transparent',
@@ -132,6 +169,12 @@ export const getChartSpecificEChartsConfig = (
 
     case 'radar':
       return getRadarConfig(definition);
+
+    case 'scatter':
+      return isScatterChartDefinition(definition)
+        ? getScatterConfig(definition)
+        : {};
+
     default:
       return {};
   }
@@ -146,7 +189,9 @@ export const getChartSpecificEChartsConfig = (
  * @param definition - Chart definition to convert.
  * @returns Complete ECharts option configuration.
  */
-export const createEChartsOptions = (definition: unknown): EChartsOption => {
+export const createEChartsOptions = (
+  definition: unknown,
+): EChartsOption => {
   if (!isEChartsDefinition(definition)) {
     return {};
   }
@@ -162,3 +207,4 @@ export const createEChartsOptions = (definition: unknown): EChartsOption => {
     ...getChartSpecificEChartsConfig(definition),
   };
 };
+
