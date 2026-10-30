@@ -2,6 +2,10 @@ import type { EChartsOption } from 'echarts';
 
 import { isRecord } from '@/common/utils/Common.utils';
 import { getAreaConfig } from '@/components/echarts/components/area-chart/area.config';
+import type { ScatterChartDefinition } from '@/components/echarts/components/scatter-chart/base/BaseScatterChart.utils';
+import { getScatterConfig } from '@/components/echarts/components/scatter-chart/scatter.config';
+import type { ScatterLineChartDefinition } from '@/components/echarts/components/scatter-line-chart/base/BaseScatterLineChart.utils';
+import { getScatterLineConfig } from '@/components/echarts/components/scatter-line-chart/scatterLine.config';
 
 import { getBarConfig } from '../components/bar-chart/bar.config';
 import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
@@ -13,9 +17,10 @@ import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
 import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
 import { getPieConfig } from '../components/pie-chart/pie.config';
 import { getRadarConfig } from '../components/radar-chart/radar.config';
-import type { ScatterChartDefinition } from '../components/scatter-chart/base/BaseScatterChart.utils';
-import { getScatterConfig } from '../components/scatter-chart/scatter.config';
-import type { EChartsDefinition, SupportedEChartType } from '../ECharts.types';
+import type {
+  EChartsDefinition,
+  SupportedEChartType,
+} from '../ECharts.types';
 
 /**
  * Supported ECharts chart types.
@@ -33,6 +38,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'pie',
   'radar',
   'scatter',
+  'scatter-line',
 ];
 
 /**
@@ -41,7 +47,9 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
  * @param type - Chart type to validate.
  * @returns Whether the value is a supported ECharts chart type.
  */
-const isSupportedEChartType = (type: unknown): type is SupportedEChartType =>
+const isSupportedEChartType = (
+  type: unknown,
+): type is SupportedEChartType =>
   typeof type === 'string' &&
   SUPPORTED_ECHART_TYPES.includes(type as SupportedEChartType);
 
@@ -86,6 +94,31 @@ const isScatterChartDefinition = (
   return (
     Array.isArray(definition['series']) &&
     isRecord(definition['scatterChartColors'])
+  );
+};
+
+/**
+ * Checks whether the definition contains Scatter Line Chart-specific data.
+ *
+ * Scatter Line Chart uses tuple-based series data that is intentionally owned
+ * by the Scatter Line Chart definition rather than the shared series definition.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Scatter Line Chart definition.
+ */
+const isScatterLineChartDefinition = (
+  definition: unknown,
+): definition is ScatterLineChartDefinition => {
+  if (
+    !isRecord(definition) ||
+    definition['type'] !== 'scatter-line'
+  ) {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['series']) &&
+    isRecord(definition['scatterLineChartColors'])
   );
 };
 
@@ -175,6 +208,11 @@ export const getChartSpecificEChartsConfig = (
         ? getScatterConfig(definition)
         : {};
 
+    case 'scatter-line':
+      return isScatterLineChartDefinition(definition)
+        ? getScatterLineConfig(definition)
+        : {};
+
     default:
       return {};
   }
@@ -207,4 +245,3 @@ export const createEChartsOptions = (
     ...getChartSpecificEChartsConfig(definition),
   };
 };
-

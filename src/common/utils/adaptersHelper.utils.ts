@@ -225,9 +225,7 @@ export const toBubbleTupleSeriesData = (
     }
 
     if (isBubblePointSeriesData(data)) {
-        return data.map(
-            ({ x, y, r }) => [x, y, r],
-        );
+        return data.map(({ x, y, r }) => [x, y, r]);
     }
 
     return [];

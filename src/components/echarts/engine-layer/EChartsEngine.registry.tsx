@@ -13,6 +13,7 @@ import {
   PieChart,
   RadarChart,
   ScatterChart,
+  ScatterLineChart,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -27,6 +28,7 @@ import { adaptEChartsHeatmapProps } from './adapters/heatmap.adapter';
 import { adaptEChartsPieProps } from './adapters/pieChart.adapter';
 import { adaptEChartsRadarProps } from './adapters/radarChart.adapter';
 import { adaptEChartsScatterProps } from './adapters/scatter.adapter';
+import { adaptEChartsScatterLineProps } from './adapters/scatterLine.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -68,6 +70,9 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   radar: {
     render: (props) => <RadarChart {...adaptEChartsRadarProps(props)} />,
+  },
+  'scatter-line': {
+    render: (props) => <ScatterLineChart {...adaptEChartsScatterLineProps(props)} />,
   },
   scatter: {
     render: (props) => <ScatterChart {...adaptEChartsScatterProps(props)} />,
