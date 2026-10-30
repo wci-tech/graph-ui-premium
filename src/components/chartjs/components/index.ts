@@ -9,3 +9,4 @@ export { GaugeMeter } from './gauge-meter';
 export { HeatmapChart } from './heatmap-chart';
 export { PieChart } from './pie-chart';
 export { RadarChart } from './radar-chart';
+export { ScatterChart } from './scatter-chart';
