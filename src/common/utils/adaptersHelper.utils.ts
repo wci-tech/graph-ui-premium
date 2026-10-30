@@ -4,6 +4,7 @@ import type {
     ChartCandlestickPoint,
     ChartGanttTask,
     ChartHeatmapPoint,
+    ChartScatterPoint,
     ChartSeriesData,
 } from '@/engines/engine.types';
 
@@ -40,6 +41,25 @@ export const isBubbleTuple = (
     typeof value[0] === 'number' &&
     typeof value[1] === 'number' &&
     typeof value[2] === 'number';
+
+export const isScatterPoint = (
+    value: unknown,
+): value is ChartScatterPoint => {
+    if (
+        typeof value !== 'object' ||
+        value === null ||
+        Array.isArray(value)
+    ) {
+        return false;
+    }
+
+    const point = value as Record<string, unknown>;
+
+    return (
+        typeof point['x'] === 'number' &&
+        typeof point['y'] === 'number'
+    );
+};
 
 export const isCandlestickPoint = (
     value: unknown,
@@ -149,6 +169,11 @@ export const isBubbleTupleSeriesData = (
 ): data is readonly ChartBubbleTuple[] =>
     data.every(isBubbleTuple);
 
+export const isScatterPointSeriesData = (
+    data: ChartSeriesData,
+): data is readonly ChartScatterPoint[] =>
+    data.every(isScatterPoint);
+
 export const isCandlestickSeriesData = (
     data: ChartSeriesData,
 ): data is readonly ChartCandlestickPoint[] =>
@@ -200,12 +225,20 @@ export const toBubbleTupleSeriesData = (
     }
 
     if (isBubblePointSeriesData(data)) {
-        return data.map(
-            ({ x, y, r }) => [x, y, r],
-        );
+        return data.map(({ x, y, r }) => [x, y, r]);
     }
 
     return [];
+};
+
+export const toScatterPointSeriesData = (
+    data: ChartSeriesData,
+): ChartScatterPoint[] => {
+    if (!isScatterPointSeriesData(data)) {
+        return [];
+    }
+
+    return Array.from(data);
 };
 
 export const toCandlestickSeriesData = (

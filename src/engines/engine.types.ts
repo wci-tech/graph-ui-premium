@@ -65,10 +65,15 @@ export interface ChartHeatmapPoint {
   readonly color?: string;
 }
 
+export interface ChartScatterPoint {
+  readonly x: number;
+  readonly y: number;
+}
 export type ChartSeriesData =
   | readonly number[]
   | readonly ChartBubblePoint[]
   | readonly ChartBubbleTuple[]
+  | readonly ChartScatterPoint[]
   | readonly ChartCandlestickPoint[]
   | readonly ChartGanttTask[]
   | readonly ChartHeatmapPoint[];

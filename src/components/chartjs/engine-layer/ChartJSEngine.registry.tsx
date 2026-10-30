@@ -12,6 +12,7 @@ import {
   HeatmapChart,
   PieChart,
   RadarChart,
+  ScatterLineChart,
 } from '@/components/chartjs/components';
 
 import { adaptChartJSAreaProps } from './adapters/area.adapter';
@@ -25,6 +26,7 @@ import { adaptChartJSGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import { adaptChartJSHeatmapProps } from './adapters/heatmap.adapter';
 import { adaptChartJSPieProps } from './adapters/pieChart.adapter';
 import { adaptChartJSRadarProps } from './adapters/radarChart.adapter';
+import { adaptChartJSScatterLineProps } from './adapters/scatterLine.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
@@ -67,5 +69,8 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   radar: {
     render: (props) => <RadarChart {...adaptChartJSRadarProps(props)} />,
+  },
+  'scatter-line': {
+    render: (props) => <ScatterLineChart {...adaptChartJSScatterLineProps(props)} />,
   },
 };
