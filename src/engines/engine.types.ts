@@ -71,6 +71,7 @@ export interface ChartScatterPoint {
 }
 export type ChartSeriesData =
   | readonly number[]
+  | readonly ChartScatterPoint[]
   | readonly ChartBubblePoint[]
   | readonly ChartBubbleTuple[]
   | readonly ChartScatterPoint[]

@@ -2,6 +2,8 @@ import type { EChartsOption } from 'echarts';
 
 import { isRecord } from '@/common/utils/Common.utils';
 import { getAreaConfig } from '@/components/echarts/components/area-chart/area.config';
+import type { ScatterChartDefinition } from '@/components/echarts/components/scatter-chart/base/BaseScatterChart.utils';
+import { getScatterConfig } from '@/components/echarts/components/scatter-chart/scatter.config';
 import type { ScatterLineChartDefinition } from '@/components/echarts/components/scatter-line-chart/base/BaseScatterLineChart.utils';
 import { getScatterLineConfig } from '@/components/echarts/components/scatter-line-chart/scatterLine.config';
 
@@ -35,6 +37,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'heatmap',
   'pie',
   'radar',
+  'scatter',
   'scatter-line',
 ];
 
@@ -70,6 +73,28 @@ export const isEChartsDefinition = (
   }
 
   return isSupportedEChartType(definition['type']);
+};
+
+/**
+ * Checks whether the definition contains Scatter Chart-specific data.
+ *
+ * Scatter Chart uses tuple-based series data that is intentionally owned
+ * by the Scatter Chart definition rather than the shared series definition.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Scatter Chart definition.
+ */
+const isScatterChartDefinition = (
+  definition: unknown,
+): definition is ScatterChartDefinition => {
+  if (!isRecord(definition) || definition['type'] !== 'scatter') {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['series']) &&
+    isRecord(definition['scatterChartColors'])
+  );
 };
 
 /**
@@ -109,7 +134,8 @@ export const getBaseEChartsConfig = (
   const isItemTooltip =
     type === 'pie' ||
     type === 'doughnut' ||
-    type === 'gauge';
+    type === 'gauge' ||
+    type === 'scatter';
 
   const isShadowPointer =
     type === 'bar' ||
@@ -176,6 +202,11 @@ export const getChartSpecificEChartsConfig = (
 
     case 'radar':
       return getRadarConfig(definition);
+
+    case 'scatter':
+      return isScatterChartDefinition(definition)
+        ? getScatterConfig(definition)
+        : {};
 
     case 'scatter-line':
       return isScatterLineChartDefinition(definition)
