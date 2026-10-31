@@ -2,25 +2,26 @@ import type { EChartsOption } from 'echarts';
 
 import { isRecord } from '@/common/utils/Common.utils';
 import { getAreaConfig } from '@/components/echarts/components/area-chart/area.config';
+import { getBarConfig } from '@/components/echarts/components/bar-chart/bar.config';
+import { getBarLineConfig } from '@/components/echarts/components/bar-line-chart/barLine.config';
+import { getBubbleConfig } from '@/components/echarts/components/bubble-chart/bubble.config';
+import { getCandlestickConfig } from '@/components/echarts/components/candlestick-chart/candlestick.config';
+import { getDoughnutConfig } from '@/components/echarts/components/doughnut-chart/doughnut.config';
+import { getGanttConfig } from '@/components/echarts/components/gantt-chart/gantt.config';
+import { getGaugeConfig } from '@/components/echarts/components/gauge-meter/gauge.config';
+import { getHeatmapConfig } from '@/components/echarts/components/heatmap-chart/heatmap.config';
+import { getPieConfig } from '@/components/echarts/components/pie-chart/pie.config';
+import { getRadarConfig } from '@/components/echarts/components/radar-chart/radar.config';
 import type { ScatterChartDefinition } from '@/components/echarts/components/scatter-chart/base/BaseScatterChart.utils';
 import { getScatterConfig } from '@/components/echarts/components/scatter-chart/scatter.config';
 import type { ScatterLineChartDefinition } from '@/components/echarts/components/scatter-line-chart/base/BaseScatterLineChart.utils';
 import { getScatterLineConfig } from '@/components/echarts/components/scatter-line-chart/scatterLine.config';
-
-import { getBarConfig } from '../components/bar-chart/bar.config';
-import { getBarLineConfig } from '../components/bar-line-chart/barLine.config';
-import { getBubbleConfig } from '../components/bubble-chart/bubble.config';
-import { getCandlestickConfig } from '../components/candlestick-chart/candlestick.config';
-import { getDoughnutConfig } from '../components/doughnut-chart/doughnut.config';
-import { getGanttConfig } from '../components/gantt-chart/gantt.config';
-import { getGaugeConfig } from '../components/gauge-meter/gauge.config';
-import { getHeatmapConfig } from '../components/heatmap-chart/heatmap.config';
-import { getPieConfig } from '../components/pie-chart/pie.config';
-import { getRadarConfig } from '../components/radar-chart/radar.config';
+import type { StackedAreaChartDefinition } from '@/components/echarts/components/stacked-area-chart/base/BaseStackedAreaChart.utils';
+import { getStackedAreaConfig } from '@/components/echarts/components/stacked-area-chart/stackedArea.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
-} from '../ECharts.types';
+} from '@/components/echarts/ECharts.types';
 
 /**
  * Supported ECharts chart types.
@@ -39,6 +40,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'radar',
   'scatter',
   'scatter-line',
+  'stacked-area',
 ];
 
 /**
@@ -78,9 +80,6 @@ export const isEChartsDefinition = (
 /**
  * Checks whether the definition contains Scatter Chart-specific data.
  *
- * Scatter Chart uses tuple-based series data that is intentionally owned
- * by the Scatter Chart definition rather than the shared series definition.
- *
  * @param definition - ECharts definition to validate.
  * @returns Whether the definition is a Scatter Chart definition.
  */
@@ -100,25 +99,41 @@ const isScatterChartDefinition = (
 /**
  * Checks whether the definition contains Scatter Line Chart-specific data.
  *
- * Scatter Line Chart uses tuple-based series data that is intentionally owned
- * by the Scatter Line Chart definition rather than the shared series definition.
- *
  * @param definition - ECharts definition to validate.
  * @returns Whether the definition is a Scatter Line Chart definition.
  */
 const isScatterLineChartDefinition = (
   definition: unknown,
 ): definition is ScatterLineChartDefinition => {
-  if (
-    !isRecord(definition) ||
-    definition['type'] !== 'scatter-line'
-  ) {
+  if (!isRecord(definition) || definition['type'] !== 'scatter-line') {
     return false;
   }
 
   return (
     Array.isArray(definition['series']) &&
     isRecord(definition['scatterLineChartColors'])
+  );
+};
+
+/**
+ * Checks whether the definition contains Stacked Area Chart-specific data.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Stacked Area Chart definition.
+ */
+const isStackedAreaChartDefinition = (
+  definition: unknown,
+): definition is StackedAreaChartDefinition => {
+  if (!isRecord(definition) || definition['type'] !== 'stacked-area') {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['labels']) &&
+    Array.isArray(definition['series']) &&
+    (definition['appearance'] === 'basic' ||
+      definition['appearance'] === 'smooth') &&
+    isRecord(definition['stackedAreaChartColors'])
   );
 };
 
@@ -211,6 +226,11 @@ export const getChartSpecificEChartsConfig = (
     case 'scatter-line':
       return isScatterLineChartDefinition(definition)
         ? getScatterLineConfig(definition)
+        : {};
+
+    case 'stacked-area':
+      return isStackedAreaChartDefinition(definition)
+        ? getStackedAreaConfig(definition)
         : {};
 
     default:
