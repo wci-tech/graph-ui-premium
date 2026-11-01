@@ -18,6 +18,8 @@ import type { ScatterLineChartDefinition } from '@/components/echarts/components
 import { getScatterLineConfig } from '@/components/echarts/components/scatter-line-chart/scatterLine.config';
 import type { StackedAreaChartDefinition } from '@/components/echarts/components/stacked-area-chart/base/BaseStackedAreaChart.utils';
 import { getStackedAreaConfig } from '@/components/echarts/components/stacked-area-chart/stackedArea.config';
+import type { StackedBarChartDefinition } from '@/components/echarts/components/stacked-bar-chart/base/BaseStackedBarChart.utils';
+import { getStackedBarConfig } from '@/components/echarts/components/stacked-bar-chart/stackedBar.config';
 import type {
   EChartsDefinition,
   SupportedEChartType,
@@ -41,6 +43,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'scatter',
   'scatter-line',
   'stacked-area',
+  'stacked-bar',
 ];
 
 /**
@@ -138,6 +141,32 @@ const isStackedAreaChartDefinition = (
 };
 
 /**
+ * Checks whether the definition contains Stacked Bar Chart-specific data.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Stacked Bar Chart definition.
+ */
+const isStackedBarChartDefinition = (
+  definition: unknown,
+): definition is StackedBarChartDefinition => {
+  if (!isRecord(definition) || definition['type'] !== 'stacked-bar') {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['labels']) &&
+    Array.isArray(definition['series']) &&
+    typeof definition['horizontal'] === 'boolean' &&
+    typeof definition['stackId'] === 'string' &&
+    typeof definition['showLegend'] === 'boolean' &&
+    typeof definition['boldLabels'] === 'boolean' &&
+    typeof definition['boldLegends'] === 'boolean' &&
+    typeof definition['maxBarWidth'] === 'number' &&
+    isRecord(definition['stackedBarChartColors'])
+  );
+};
+
+/**
  * Creates the base ECharts configuration shared by all supported chart types.
  *
  * @param type - Supported ECharts chart type.
@@ -231,6 +260,11 @@ export const getChartSpecificEChartsConfig = (
     case 'stacked-area':
       return isStackedAreaChartDefinition(definition)
         ? getStackedAreaConfig(definition)
+        : {};
+
+    case 'stacked-bar':
+      return isStackedBarChartDefinition(definition)
+        ? getStackedBarConfig(definition)
         : {};
 
     default:

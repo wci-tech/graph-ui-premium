@@ -15,6 +15,7 @@ import {
   ScatterChart,
   ScatterLineChart,
   StackedAreaChart,
+  StackedBarChart,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -31,6 +32,7 @@ import { adaptEChartsRadarProps } from './adapters/radarChart.adapter';
 import { adaptEChartsScatterProps } from './adapters/scatter.adapter';
 import { adaptEChartsScatterLineProps } from './adapters/scatterLine.adapter';
 import { adaptEChartsStackedAreaProps } from './adapters/stacked-area.adapter';
+import { adaptEChartsStackedBarProps } from './adapters/stacked-bar.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -81,5 +83,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   'stacked-area': {
     render: (props) => <StackedAreaChart {...adaptEChartsStackedAreaProps(props)} />,
+  },
+  'stacked-bar': {
+    render: (props) => <StackedBarChart {...adaptEChartsStackedBarProps(props)} />,
   },
 };
