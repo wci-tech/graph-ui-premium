@@ -28,6 +28,7 @@ import type {
 } from '@/components/echarts/ECharts.types';
 
 import { getNetworkConfig } from '../components/network-graph/network.config';
+import { getTreemapConfig } from '../components/treemap-chart/treemap.config';
 
 /**
  * Supported ECharts chart types.
@@ -50,6 +51,8 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'scatter-line',
   'stacked-area',
   'stacked-bar',
+  'treemap',
+
 ];
 
 /**
@@ -310,6 +313,11 @@ export const getChartSpecificEChartsConfig = (
       return isStackedBarChartDefinition(definition)
         ? getStackedBarConfig(definition)
         : {};
+
+    case 'treemap':
+      return getTreemapConfig(definition);
+
+
 
     default:
       return {};

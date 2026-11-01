@@ -18,6 +18,7 @@ import {
   ScatterLineChart,
   StackedAreaChart,
   StackedBarChart,
+  TreemapChart,
 } from '@/components/echarts/components';
 
 import { adaptEChartsAreaProps } from './adapters/area.adapter';
@@ -37,6 +38,7 @@ import { adaptEChartsScatterProps } from './adapters/scatter.adapter';
 import { adaptEChartsScatterLineProps } from './adapters/scatterLine.adapter';
 import { adaptEChartsStackedAreaProps } from './adapters/stacked-area.adapter';
 import { adaptEChartsStackedBarProps } from './adapters/stacked-bar.adapter';
+import { adaptEChartsTreemapProps } from './adapters/treemap.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
@@ -96,5 +98,8 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   'stacked-bar': {
     render: (props) => <StackedBarChart {...adaptEChartsStackedBarProps(props)} />,
+  },
+  treemap: {
+    render: (props) => <TreemapChart {...adaptEChartsTreemapProps(props)} />,
   },
 };

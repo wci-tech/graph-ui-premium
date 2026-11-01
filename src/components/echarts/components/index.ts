@@ -1,3 +1,4 @@
+export { WaterfallChart } from '../../../../../graph-ui/new/echart/waterfall-chart';
 export { AreaChart } from './area-chart';
 export { BarChart } from './bar-chart'
 export { BarLineChart } from './bar-line-chart'
@@ -15,3 +16,4 @@ export { ScatterChart } from './scatter-chart';
 export { ScatterLineChart } from './scatter-line-chart';
 export { StackedAreaChart } from './stacked-area-chart';
 export { StackedBarChart } from './stacked-bar-chart';
+export { TreemapChart } from './treemap-chart';
