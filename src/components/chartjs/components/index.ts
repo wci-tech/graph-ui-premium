@@ -12,3 +12,4 @@ export { RadarChart } from './radar-chart';
 export { ScatterChart } from './scatter-chart';
 export { ScatterLineChart } from './scatter-line-chart';
 export { StackedAreaChart } from './stacked-area-chart';
+export { StackedBarChart } from './stacked-bar-chart';
