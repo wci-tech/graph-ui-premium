@@ -7,6 +7,7 @@ import {
   BubbleChart,
   CandlestickChart,
   DoughnutChart,
+  FunnelChart,
   GanttChart,
   GaugeMeter,
   HeatmapChart,
@@ -24,6 +25,7 @@ import { adaptEChartsBarLineProps } from './adapters/bar-line.adapter';
 import { adaptEChartsBubbleProps } from './adapters/bubble.adapter';
 import { adaptEChartsCandlestickProps } from './adapters/candlestick.adapter';
 import { adaptEChartsDoughnutProps } from './adapters/doughnut.adapter';
+import { adaptEChartsFunnelProps } from './adapters/funnel.adapter';
 import { adaptEChartsGanttProps } from './adapters/gantt.adapter';
 import { adaptEChartsGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import { adaptEChartsHeatmapProps } from './adapters/heatmap.adapter';
@@ -62,6 +64,9 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   doughnut: {
     render: (props) => <DoughnutChart {...adaptEChartsDoughnutProps(props)} />,
+  },
+  funnel: {
+    render: (props) => <FunnelChart {...adaptEChartsFunnelProps(props)} />,
   },
   heatmap: {
     render: (props) => <HeatmapChart {...adaptEChartsHeatmapProps(props)} />,
