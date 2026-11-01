@@ -1,0 +1,18 @@
+export const NETWORK_GRAPH_CONFIG = {
+    defaultHeight: '400px',
+    symbolSize: 36,
+    labelFontSize: 10,
+    lineWidth: 1.5,
+    lineOpacity: 0.6,
+    lineCurveness: 0.2,
+    emphasisLineWidth: 3,
+    emphasisLineOpacity: 1,
+    repulsion: 150,
+    largeNetworkRepulsion: 50,
+    largeNetworkThreshold: 20,
+    gravity: 0.1,
+    edgeLength: [30, 100] as [number, number],
+    friction: 0.6,
+    crosshairWidth: 1,
+    legendBottom: 5,
+} as const;

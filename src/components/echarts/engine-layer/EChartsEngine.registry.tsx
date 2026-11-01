@@ -11,6 +11,7 @@ import {
   GanttChart,
   GaugeMeter,
   HeatmapChart,
+  NetworkGraph,
   PieChart,
   RadarChart,
   ScatterChart,
@@ -29,6 +30,7 @@ import { adaptEChartsFunnelProps } from './adapters/funnel.adapter';
 import { adaptEChartsGanttProps } from './adapters/gantt.adapter';
 import { adaptEChartsGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import { adaptEChartsHeatmapProps } from './adapters/heatmap.adapter';
+import { adaptEChartsNetworkGraphProps } from './adapters/network.adapter';
 import { adaptEChartsPieProps } from './adapters/pieChart.adapter';
 import { adaptEChartsRadarProps } from './adapters/radarChart.adapter';
 import { adaptEChartsScatterProps } from './adapters/scatter.adapter';
@@ -70,6 +72,9 @@ export const ECHARTS_ENGINE_REGISTRY: EngineRegistry = {
   },
   heatmap: {
     render: (props) => <HeatmapChart {...adaptEChartsHeatmapProps(props)} />,
+  },
+  network: {
+    render: (props) => <NetworkGraph {...adaptEChartsNetworkGraphProps(props)} />,
   },
   gauge: {
     render: (props) => <GaugeMeter {...adaptEChartsGaugeMeterProps(props)} />,
