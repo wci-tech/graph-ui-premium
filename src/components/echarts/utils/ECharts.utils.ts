@@ -7,6 +7,8 @@ import { getBarLineConfig } from '@/components/echarts/components/bar-line-chart
 import { getBubbleConfig } from '@/components/echarts/components/bubble-chart/bubble.config';
 import { getCandlestickConfig } from '@/components/echarts/components/candlestick-chart/candlestick.config';
 import { getDoughnutConfig } from '@/components/echarts/components/doughnut-chart/doughnut.config';
+import type { FunnelChartDefinition } from '@/components/echarts/components/funnel-chart/base/BaseFunnelChart.utils';
+import { getFunnelConfig } from '@/components/echarts/components/funnel-chart/funnel.config';
 import { getGanttConfig } from '@/components/echarts/components/gantt-chart/gantt.config';
 import { getGaugeConfig } from '@/components/echarts/components/gauge-meter/gauge.config';
 import { getHeatmapConfig } from '@/components/echarts/components/heatmap-chart/heatmap.config';
@@ -35,6 +37,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'bubble',
   'candlestick',
   'doughnut',
+  'funnel',
   'gantt',
   'gauge',
   'heatmap',
@@ -78,6 +81,35 @@ export const isEChartsDefinition = (
   }
 
   return isSupportedEChartType(definition['type']);
+};
+
+/**
+ * Checks whether the definition contains Funnel Chart-specific data.
+ *
+ * @param definition - ECharts definition to validate.
+ * @returns Whether the definition is a Funnel Chart definition.
+ */
+const isFunnelChartDefinition = (
+  definition: unknown,
+): definition is FunnelChartDefinition => {
+  if (!isRecord(definition) || definition['type'] !== 'funnel') {
+    return false;
+  }
+
+  return (
+    Array.isArray(definition['labels']) &&
+    Array.isArray(definition['series']) &&
+    typeof definition['funnelAlign'] === 'string' &&
+    (typeof definition['sort'] === 'string' ||
+      typeof definition['sort'] === 'function') &&
+    typeof definition['gap'] === 'number' &&
+    typeof definition['minSize'] === 'string' &&
+    typeof definition['maxSize'] === 'string' &&
+    typeof definition['showLegend'] === 'boolean' &&
+    typeof definition['boldLabels'] === 'boolean' &&
+    typeof definition['boldLegends'] === 'boolean' &&
+    isRecord(definition['funnelChartColors'])
+  );
 };
 
 /**
@@ -179,7 +211,8 @@ export const getBaseEChartsConfig = (
     type === 'pie' ||
     type === 'doughnut' ||
     type === 'gauge' ||
-    type === 'scatter';
+    type === 'scatter' ||
+    type === 'funnel';
 
   const isShadowPointer =
     type === 'bar' ||
@@ -231,6 +264,11 @@ export const getChartSpecificEChartsConfig = (
 
     case 'doughnut':
       return getDoughnutConfig(definition);
+
+    case 'funnel':
+      return isFunnelChartDefinition(definition)
+        ? getFunnelConfig(definition)
+        : {};
 
     case 'gantt':
       return getGanttConfig(definition);
