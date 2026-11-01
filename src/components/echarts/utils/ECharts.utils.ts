@@ -27,6 +27,8 @@ import type {
   SupportedEChartType,
 } from '@/components/echarts/ECharts.types';
 
+import { getNetworkConfig } from '../components/network-graph/network.config';
+
 /**
  * Supported ECharts chart types.
  */
@@ -41,6 +43,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'gantt',
   'gauge',
   'heatmap',
+  'network',
   'pie',
   'radar',
   'scatter',
@@ -278,6 +281,9 @@ export const getChartSpecificEChartsConfig = (
 
     case 'heatmap':
       return getHeatmapConfig(definition);
+
+    case 'network':
+      return getNetworkConfig(definition);
 
     case 'pie':
       return getPieConfig(definition);

@@ -1,0 +1,20 @@
+export const NETWORK_GRAPH_CONFIG = {
+    defaultHeight: '400px',
+    nodeRadius: 12,
+    nodeHoverRadius: 15,
+    edgeWidth: 2,
+    edgeTension: 0.1,
+    linkDistance: 50,
+    manyBodyStrength: -50,
+    simulationIterations: 500,
+    labelFontSize: 11,
+    labelOffset: 6,
+    crosshairWidth: 1,
+    crosshairDash: [5, 5],
+    layoutPadding: {
+        top: 40,
+        bottom: 50,
+        left: 50,
+        right: 70,
+    },
+} as const;

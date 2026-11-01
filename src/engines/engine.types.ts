@@ -74,7 +74,6 @@ export type ChartSeriesData =
   | readonly ChartScatterPoint[]
   | readonly ChartBubblePoint[]
   | readonly ChartBubbleTuple[]
-  | readonly ChartScatterPoint[]
   | readonly ChartCandlestickPoint[]
   | readonly ChartGanttTask[]
   | readonly ChartHeatmapPoint[];
@@ -88,14 +87,29 @@ export interface ChartSeriesItem {
   readonly borderWidth?: number;
 }
 
+export interface ChartNetworkNode {
+  readonly id: string | number;
+  readonly label: string;
+  readonly size?: number;
+  readonly color?: string;
+}
+
+export interface ChartNetworkEdge {
+  readonly from: string | number;
+  readonly to: string | number;
+  readonly color?: string;
+}
+
 export type ChartData = {
   readonly labels: string[];
-  readonly series: readonly ChartSeriesItem[];
+  readonly series: ChartSeriesItem[];
   readonly type?: string;
+  readonly nodes?: ChartNetworkNode[];
+  readonly edges?: ChartNetworkEdge[];
 };
 
 export type ChartColors = {
-  readonly series?: readonly string[];
+  readonly series?: string[];
   readonly axisText?: string;
   readonly axisLine?: string;
   readonly grid?: string;
