@@ -7,7 +7,7 @@ import type { Meta } from '@storybook/react';
 import { Box, FlexItem, FlexLayout, responsive, Typography } from '@wci-tech/core-ui-premium';
 import type { TooltipItem } from 'chart.js';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
-
+import type { ChartColors } from '@/engines/engine.types';
 import { Chart } from '@/charts/Chart';
 import type { ChartData } from '@/engines/engine.types';
 
@@ -49,7 +49,7 @@ const revenueData: ChartData = {
 /* Shared colors                                                               */
 /* -------------------------------------------------------------------------- */
 
-const customColors = {
+const customColors: ChartColors = {
   series: [
     'var(--wci-chart-purple)',
     'var(--wci-chart-teal)',
@@ -61,9 +61,9 @@ const customColors = {
   tooltipBackground: 'var(--wci-chart-tooltip-background)',
   tooltipText: 'var(--wci-chart-tooltip-text)',
   tooltipBorder: 'var(--wci-chart-tooltip-border)',
-} as const;
+};
 
-const alternateColors = {
+const alternateColors: ChartColors = {
   series: [
     'var(--wci-chart-magenta)',
     'var(--wci-chart-blue)',
@@ -71,7 +71,7 @@ const alternateColors = {
     'var(--wci-chart-yellow)',
     'var(--wci-chart-purple)',
   ],
-} as const;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Styles                                                                      */

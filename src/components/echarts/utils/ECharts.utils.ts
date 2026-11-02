@@ -27,6 +27,7 @@ import type {
   SupportedEChartType,
 } from '@/components/echarts/ECharts.types';
 
+import { getLineConfig } from '../components/line-chart/line.config';
 import { getNetworkConfig } from '../components/network-graph/network.config';
 import { getTreemapConfig } from '../components/treemap-chart/treemap.config';
 import { getWaterfallConfig } from '../components/waterfall-chart/waterfall.config';
@@ -45,6 +46,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'gantt',
   'gauge',
   'heatmap',
+  'line',
   'network',
   'pie',
   'radar',
@@ -285,6 +287,9 @@ export const getChartSpecificEChartsConfig = (
 
     case 'heatmap':
       return getHeatmapConfig(definition);
+
+    case 'line':
+      return getLineConfig(definition);
 
     case 'network':
       return getNetworkConfig(definition);

@@ -71,11 +71,15 @@ export type ChartJSOptions = {
   interaction?: Record<string, unknown>;
 } & Record<string, unknown>;
 
+type ChartJSPlugin = {
+  [TType in ChartJSNativeType]: Plugin<TType>;
+}[ChartJSNativeType];
+
 export type ChartjsProps = {
   type: ChartType;
   data: ChartJSData;
   options?: ChartJSOptions;
-  plugins?: Plugin<ChartJSNativeType>[];
+  plugins?: ChartJSPlugin[];
   showDownload?: boolean;
   downloadPlacement?: DownloadPlacement;
   customStyles?: ChartCustomStyles;

@@ -9,6 +9,7 @@ export { FunnelChart } from './funnel-chart';
 export { GanttChart } from './gantt-chart'
 export { GaugeMeter } from './gauge-meter';
 export { HeatmapChart } from './heatmap-chart';
+export { LineChart } from './line-chart';
 export { NetworkGraph } from './network-graph';
 export { PieChart } from './pie-chart';
 export { RadarChart } from './radar-chart';

@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 
-import { LineChart } from '@/components/uplot/components/line-chart/LineChart';
-
 import type { Meta } from '@storybook/react';
-import type { LineChartEffect } from '@/components/uplot/components/line-chart/LineChart.types';
 import { Box, FlexItem, FlexLayout, Typography } from '@wci-tech/core-ui-premium';
+
+import { LineChart } from '@/components/uplot/components/line-chart/LineChart';
+import type { LineChartEffect } from '@/components/uplot/components/line-chart/LineChart.types';
 
 const meta: Meta<typeof LineChart> = {
   title: 'components/uplot/LineChart',
@@ -112,11 +112,11 @@ const codePill = css`
 `;
 
 const customChartVariables = css`
-  --line-chart-line-color: #e11d48;
-  --line-chart-secondary-line-color: #7c3aed;
-  --line-chart-axis-color: #f97316;
-  --line-chart-grid-color: #84cc16;
-  --line-chart-point-bg-color: #ffffff;
+  --wci-chart-blue: #e11d48;
+  --wci-chart-teal: #7c3aed;
+  --wci-chart-axis-text: #f97316;
+  --wci-chart-grid: #84cc16;
+  --wci-chart-point-fill: #ffffff;
 `;
 
 const PageIntro = ({
@@ -147,33 +147,25 @@ const ChartCard = ({
   readonly description: string;
   readonly api: string;
   readonly children: React.ReactNode;
-}) => {
-  return (
-    <Box customStyles={chartCard}>
-      <FlexLayout direction="column" gap="12px">
-        <Typography variant="h3" customStyles={titleH3}>
-          {title}
-        </Typography>
+}) => (
+  <Box customStyles={chartCard}>
+    <FlexLayout direction="column" gap="12px">
+      <Typography variant="h3" customStyles={titleH3}>
+        {title}
+      </Typography>
 
-        <Typography
-          variant="p"
-          customStyles={css`
-            ${paragraphSmall};
-            color: var (--wci-gray-700);
-          `}
-        >
-          {description}
-        </Typography>
+      <Typography variant="p" customStyles={paragraphSmall}>
+        {description}
+      </Typography>
 
-        <Typography variant="span" customStyles={codePill}>
-          {api}
-        </Typography>
+      <Typography variant="span" customStyles={codePill}>
+        {api}
+      </Typography>
 
-        <div css={chartShell}>{children}</div>
-      </FlexLayout>
-    </Box>
-  );
-};
+      <div css={chartShell}>{children}</div>
+    </FlexLayout>
+  </Box>
+);
 
 const EffectStory = ({
   effect,
@@ -201,7 +193,6 @@ const EffectStory = ({
           <div css={chartShell}>
             <LineChart
               data={multiSeriesData}
-              variant="primary"
               appearance="smooth"
               effect={effect}
               options={{ height: 420 }}
@@ -218,76 +209,47 @@ export const Default = () => (
     <div css={pageContainer}>
       <PageIntro
         title="Default uPlot Line Chart"
-        description="Default uPlot line chart using the primary variant, solid appearance, and lightweight rendering pipeline."
+        description="Default uPlot line chart using the shared CSS-variable palette, solid appearance, and lightweight rendering pipeline."
       />
 
       <Box customStyles={heroBox}>
-        <LineChart
-          data={mockData}
-          variant="primary"
-          appearance="solid"
-          effect="none"
-          options={{ height: 400 }}
-        />
+        <LineChart data={mockData} appearance="solid" effect="none" options={{ height: 400 }} />
       </Box>
     </div>
   </main>
 );
 
-export const AllVariants = () => (
+export const Appearances = () => (
   <main role="main">
     <div css={pageContainer}>
       <PageIntro
-        title="uPlot Line Chart Variants"
-        description="Primary and secondary variants rendered with solid and smooth appearances using the same unified LineChart API."
+        title="uPlot Line Chart Appearances"
+        description="Compare solid, smooth, and stepped line appearances using the same shared data and CSS-variable color system."
       />
 
       <Typography variant="h2" customStyles={titleH2}>
-        Brand and Appearance Variants
+        Line Appearances
       </Typography>
 
       <FlexLayout columns={12} gap={{ default: '24px', md: '32px' }} wrap="wrap">
         <FlexItem columnSpan={{ default: 12, md: 6 }}>
           <ChartCard
-            title="Primary Solid Line"
-            description="Primary variant with the default solid line appearance."
-            api='variant="primary" appearance="solid"'
+            title="Solid Line"
+            description="Standard line rendering with direct connections between data points."
+            api='appearance="solid"'
           >
-            <LineChart
-              data={mockData}
-              variant="primary"
-              appearance="solid"
-              effect="none"
-              options={{ height: 360 }}
-            />
+            <LineChart data={mockData} appearance="solid" effect="none" options={{ height: 360 }} />
           </ChartCard>
         </FlexItem>
 
         <FlexItem columnSpan={{ default: 12, md: 6 }}>
           <ChartCard
-            title="Secondary Solid Line"
-            description="Secondary variant with the default solid line appearance."
-            api='variant="secondary" appearance="solid"'
+            title="Smooth Line"
+            description="Smooth line rendering for a softer visual transition between data points."
+            api='appearance="smooth"'
           >
             <LineChart
               data={mockData}
-              variant="secondary"
-              appearance="solid"
-              effect="none"
-              options={{ height: 360 }}
-            />
-          </ChartCard>
-        </FlexItem>
-
-        <FlexItem columnSpan={{ default: 12, md: 6 }}>
-          <ChartCard
-            title="Primary Smooth Multi-Series"
-            description="Primary variant with smooth paths and multiple datasets."
-            api='variant="primary" appearance="smooth"'
-          >
-            <LineChart
-              data={multiSeriesData}
-              variant="primary"
               appearance="smooth"
               effect="none"
               options={{ height: 360 }}
@@ -297,13 +259,27 @@ export const AllVariants = () => (
 
         <FlexItem columnSpan={{ default: 12, md: 6 }}>
           <ChartCard
-            title="Secondary Smooth Multi-Series"
-            description="Secondary variant with smooth paths and multiple datasets."
-            api='variant="secondary" appearance="smooth"'
+            title="Stepped Line"
+            description="Stepped rendering for discrete value transitions between data points."
+            api='appearance="stepped"'
+          >
+            <LineChart
+              data={mockData}
+              appearance="stepped"
+              effect="none"
+              options={{ height: 360 }}
+            />
+          </ChartCard>
+        </FlexItem>
+
+        <FlexItem columnSpan={{ default: 12, md: 6 }}>
+          <ChartCard
+            title="Smooth Multi-Series"
+            description="Multiple datasets automatically consume colors from the shared chart palette."
+            api='appearance="smooth"'
           >
             <LineChart
               data={multiSeriesData}
-              variant="secondary"
               appearance="smooth"
               effect="none"
               options={{ height: 360 }}
@@ -319,7 +295,7 @@ export const FadeInEffect = () => (
   <EffectStory
     effect="fade-in"
     title="Fade In Effect"
-    description="Fade in gives the uPlot chart a simple entrance animation while keeping the rendering lightweight and fast."
+    description="Fade in gives the uPlot chart a lightweight entrance animation while preserving rendering performance."
   />
 );
 
@@ -328,7 +304,7 @@ export const CustomStyles = () => (
     <div css={pageContainer}>
       <PageIntro
         title="uPlot Line Chart Custom Styles"
-        description="Examples showing CSS variable overrides, high-density rendering, and explicit series-level color overrides."
+        description="Examples showing shared CSS-variable overrides, explicit series colors, and high-density rendering."
       />
 
       <Typography variant="h2" customStyles={titleH2}>
@@ -339,12 +315,11 @@ export const CustomStyles = () => (
         <FlexItem columnSpan={{ default: 12, md: 6 }}>
           <ChartCard
             title="Custom CSS Variables"
-            description="Overrides line, axis, grid, and point colors using wrapper-level CSS variables."
+            description="Overrides palette, axis, grid, and point colors through wrapper-level shared chart CSS variables."
             api="customStyles.wrapper"
           >
             <LineChart
               data={multiSeriesData}
-              variant="primary"
               appearance="smooth"
               effect="fade-in"
               customStyles={{
@@ -358,7 +333,7 @@ export const CustomStyles = () => (
         <FlexItem columnSpan={{ default: 12, md: 6 }}>
           <ChartCard
             title="Explicit Series Color"
-            description="Series color can be provided directly when you want to override variant-driven colors."
+            description="An explicit series color takes precedence over the shared CSS-variable palette."
             api="series.color"
           >
             <LineChart
@@ -372,8 +347,8 @@ export const CustomStyles = () => (
                   },
                 ],
               }}
-              variant="primary"
               appearance="solid"
+              effect="none"
               options={{ height: 360 }}
             />
           </ChartCard>
@@ -395,8 +370,8 @@ export const CustomStyles = () => (
                   },
                 ],
               }}
-              variant="primary"
               appearance="solid"
+              effect="none"
               options={{ height: 500 }}
             />
           </ChartCard>

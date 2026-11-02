@@ -6,6 +6,7 @@ import {
 } from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
+import type { Plugin } from 'chart.js';
 
 import {
     createGaugeMeterData,
@@ -32,29 +33,12 @@ export const useGaugeMeter = ({
     className,
     testId = 'gauge-meter-test-id',
 }: GaugeMeterHookProps): GaugeMeterHookReturn => {
-    const wrapperRef =
-        useRef<HTMLDivElement>(null);
-
-    const [
-        rootElement,
-        setRootElement,
-    ] =
-        useState<HTMLDivElement | null>(
-            null,
-        );
-
-    const [
-        resolvedColors,
-        setResolvedColors,
-    ] =
-        useState<
-            GaugeMeterResolvedColors
-        >();
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
+    const [resolvedColors, setResolvedColors] = useState<GaugeMeterResolvedColors>();
 
     useLayoutEffect(() => {
-        setRootElement(
-            wrapperRef.current,
-        );
+        setRootElement(wrapperRef.current);
     }, [
         customStyles?.wrapper,
         rendererCustomStyles?.container,
@@ -88,88 +72,72 @@ export const useGaugeMeter = ({
         ],
     );
 
-    const processedData =
-        useMemo<
-            GaugeMeterHookReturn['processedData']
-        >(() => {
-            if (!resolvedColors) {
-                return {
-                    labels: Array.from(labels),
-                    datasets: [],
-                };
-            }
+    const processedData = useMemo(() => {
+        if (!resolvedColors) {
+            return {
+                labels: Array.from(labels),
+                datasets: [],
+            };
+        }
 
-            return createGaugeMeterData({
-                labels,
-                data,
-                colors: resolvedColors,
-            });
-        }, [
-            data,
+        return createGaugeMeterData({
             labels,
-            resolvedColors,
-        ]);
+            data,
+            colors: resolvedColors,
+        });
+    }, [
+        data,
+        labels,
+        resolvedColors,
+    ]);
 
-    const gaugeOptions =
-        useMemo<
-            GaugeMeterHookReturn['gaugeOptions']
-        >(() => {
-            if (!resolvedColors) {
-                return undefined;
-            }
+    const gaugeOptions = useMemo(() => {
+        if (!resolvedColors) {
+            return undefined;
+        }
 
-            return createGaugeMeterOptions(
-                compactObject({
-                    options,
-                    colors: resolvedColors,
-                }),
-            );
-        }, [
-            options,
-            resolvedColors,
-        ]);
-
-    const plugins =
-        useMemo<
-            GaugeMeterHookReturn['plugins']
-        >(() => {
-            if (!resolvedColors) {
-                return [];
-            }
-
-            return createGaugeMeterPlugins(
-                compactObject({
-                    value: resolvedValue,
-                    colors: resolvedColors,
-                    options,
-                }),
-            );
-        }, [
-            options,
-            resolvedColors,
-            resolvedValue,
-        ]);
-
-    const wrapperProps =
-        useMemo<
-            GaugeMeterHookReturn['wrapperProps']
-        >(
-            () =>
-                compactObject({
-                    className,
-
-                    'data-testid':
-                        testId,
-
-                    'data-effect':
-                        effect,
-                }),
-            [
-                className,
-                effect,
-                testId,
-            ],
+        return createGaugeMeterOptions(
+            compactObject({
+                options,
+                colors: resolvedColors,
+            }),
         );
+    }, [
+        options,
+        resolvedColors,
+    ]);
+
+    const plugins = useMemo<Plugin<'doughnut'>[]>(() => {
+        if (!resolvedColors) {
+            return [];
+        }
+
+        return createGaugeMeterPlugins(
+            compactObject({
+                value: resolvedValue,
+                colors: resolvedColors,
+                options,
+            }),
+        );
+    }, [
+        options,
+        resolvedColors,
+        resolvedValue,
+    ]);
+
+    const wrapperProps = useMemo(
+        () =>
+            compactObject({
+                className,
+                'data-testid': testId,
+                'data-effect': effect,
+            }),
+        [
+            className,
+            effect,
+            testId,
+        ],
+    );
 
     const isReady =
         rootElement !== null &&
