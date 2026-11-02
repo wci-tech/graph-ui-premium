@@ -38,7 +38,7 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:watch": "vitest --coverage",
     "build-storybook": "storybook build --config-dir ./.storybook",
-    "storybook": "storybook dev --config-dir ./.storybook -p 6006",
+    "storybook": "storybook dev --config-dir ./.storybook -p 6008",
     "build:lib": "tsup",
     "build": "run-s clean typecheck lint build:lib",
     "ci": "yarn build",
