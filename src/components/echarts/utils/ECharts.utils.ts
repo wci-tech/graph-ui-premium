@@ -29,6 +29,7 @@ import type {
 
 import { getNetworkConfig } from '../components/network-graph/network.config';
 import { getTreemapConfig } from '../components/treemap-chart/treemap.config';
+import { getWaterfallConfig } from '../components/waterfall-chart/waterfall.config';
 
 /**
  * Supported ECharts chart types.
@@ -52,7 +53,7 @@ const SUPPORTED_ECHART_TYPES: readonly SupportedEChartType[] = [
   'stacked-area',
   'stacked-bar',
   'treemap',
-
+  'waterfall',
 ];
 
 /**
@@ -317,7 +318,8 @@ export const getChartSpecificEChartsConfig = (
     case 'treemap':
       return getTreemapConfig(definition);
 
-
+    case 'waterfall':
+      return getWaterfallConfig(definition);
 
     default:
       return {};
