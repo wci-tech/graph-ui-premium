@@ -19,6 +19,7 @@ import {
   StackedAreaChart,
   StackedBarChart,
   TreemapChart,
+  WaterfallChart,
 } from '@/components/chartjs/components';
 
 import { adaptChartJSAreaProps } from './adapters/area.adapter';
@@ -39,6 +40,7 @@ import { adaptChartJSScatterLineProps } from './adapters/scatterLine.adapter';
 import { adaptChartJSStackedAreaProps } from './adapters/stacked-area.adapter';
 import { adaptChartJSStackedBarProps } from './adapters/stacked-bar.adapter';
 import { adaptChartJSTreemapProps } from './adapters/treemap.adapter';
+import { adaptChartJSWaterfallProps } from './adapters/waterfall.adapter';
 import type { EngineRegistry } from './engineRegistry.types';
 
 export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
@@ -102,5 +104,8 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   treemap: {
     render: (props) => <TreemapChart {...adaptChartJSTreemapProps(props)} />,
+  },
+  waterfall: {
+    render: (props) => <WaterfallChart {...adaptChartJSWaterfallProps(props)} />,
   },
 };
