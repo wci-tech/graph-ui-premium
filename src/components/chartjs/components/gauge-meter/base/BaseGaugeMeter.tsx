@@ -3,7 +3,6 @@
 import { compactObject } from '@wci-tech/core-ui-premium';
 
 import Chartjs from '@/components/chartjs/Chartjs';
-import type { ChartjsProps } from '@/components/chartjs/ChartJS.types';
 
 import { useGaugeMeter } from '../hooks/useGaugeMeter';
 
@@ -34,7 +33,6 @@ export const BaseGaugeMeter = ({
     wrapperProps,
     resolvedColors,
     resolvedValue,
-    isReady,
   } = useGaugeMeter(
     compactObject({
       labels,
@@ -52,24 +50,22 @@ export const BaseGaugeMeter = ({
 
   const wrapperStyles = [styles.wrapper, customStyles?.wrapper, rendererCustomStyles?.container];
 
-  if (!isReady || !resolvedColors) {
+  if (!resolvedColors || !gaugeOptions) {
     return <div ref={wrapperRef} {...wrapperProps} css={wrapperStyles} />;
   }
-
-  const chartjsProps: ChartjsProps = compactObject({
-    type: 'doughnut' as const,
-    data: processedData,
-    options: gaugeOptions,
-    plugins,
-    showDownload,
-    downloadPlacement,
-    customStyles: rendererCustomStyles,
-  });
 
   return (
     <div ref={wrapperRef} {...wrapperProps} css={wrapperStyles}>
       <div css={[styles.chart, customStyles?.chart]}>
-        <Chartjs {...chartjsProps} />
+        <Chartjs
+          type="doughnut"
+          data={processedData}
+          options={gaugeOptions}
+          plugins={plugins}
+          showDownload={showDownload}
+          downloadPlacement={downloadPlacement}
+          {...(rendererCustomStyles !== undefined ? { customStyles: rendererCustomStyles } : {})}
+        />
       </div>
 
       <div css={[styles.score, customStyles?.score]}>

@@ -1,7 +1,6 @@
 import type {
   LineChartEffect,
   LineChartProps,
-  LineChartVariant,
 } from '@/components/uplot/components/line-chart/LineChart.types';
 import type { UPlotAppearance, UPlotRendererOptions } from '@/components/uplot/UPlot.types';
 import type { EngineRendererProps } from '@/engines/engine.types';
@@ -9,8 +8,6 @@ import type { EngineRendererProps } from '@/engines/engine.types';
 const UPLOT_LINE_EFFECTS: readonly LineChartEffect[] = ['none', 'fade-in'];
 
 const UPLOT_LINE_APPEARANCES: readonly UPlotAppearance[] = ['solid', 'smooth', 'stepped'];
-
-const UPLOT_LINE_VARIANTS: readonly LineChartVariant[] = ['primary', 'secondary'];
 
 const resolveEffect = (effect: EngineRendererProps['effect']): LineChartEffect =>
   UPLOT_LINE_EFFECTS.includes(effect as LineChartEffect) ? (effect as LineChartEffect) : 'none';
@@ -27,11 +24,6 @@ const resolveAppearance = (
     : undefined;
 };
 
-const resolveVariant = (variant: EngineRendererProps['variant']): LineChartVariant | undefined =>
-  UPLOT_LINE_VARIANTS.includes(variant as LineChartVariant)
-    ? (variant as LineChartVariant)
-    : undefined;
-
 const resolveOptions = (
   options: EngineRendererProps['options'],
 ): UPlotRendererOptions | undefined => {
@@ -42,107 +34,87 @@ const resolveOptions = (
   return {
     ...(typeof options.height === 'number'
       ? {
-          height: options.height,
-        }
+        height: options.height,
+      }
       : {}),
-
     ...(typeof options.fileName === 'string'
       ? {
-          fileName: options.fileName,
-        }
+        fileName: options.fileName,
+      }
       : {}),
-
     ...(typeof options.chartBackground === 'string'
       ? {
-          chartBackground: options.chartBackground,
-        }
+        chartBackground: options.chartBackground,
+      }
       : {}),
   };
 };
 
+const resolveSeriesData = (data: EngineRendererProps['data']['series'][number]['data']): number[] =>
+  Array.isArray(data) ? data.filter((value): value is number => typeof value === 'number') : [];
+
 export const adaptUPlotLineProps = ({
   data,
   options,
-  variant,
   appearance,
   effect,
-
   showDownload,
   downloadPlacement,
   customStyles,
-
   className,
   testId,
 }: EngineRendererProps): LineChartProps => {
   const resolvedOptions = resolveOptions(options);
-  const resolvedVariant = resolveVariant(variant);
   const resolvedAppearance = resolveAppearance(appearance);
 
   return {
     data: {
       labels: Array.from(data.labels),
-
       series: data.series.map((seriesItem) => ({
         label: seriesItem.label,
-
-        data: Array.from(seriesItem.data),
-
+        data: resolveSeriesData(seriesItem.data),
         ...(seriesItem.color
           ? {
-              color: seriesItem.color,
-            }
+            color: seriesItem.color,
+          }
           : {}),
       })),
     },
-
     ...(resolvedOptions
       ? {
-          options: resolvedOptions,
-        }
+        options: resolvedOptions,
+      }
       : {}),
-
-    ...(resolvedVariant
-      ? {
-          variant: resolvedVariant,
-        }
-      : {}),
-
     ...(resolvedAppearance
       ? {
-          appearance: resolvedAppearance,
-        }
+        appearance: resolvedAppearance,
+      }
       : {}),
-
     ...(showDownload !== undefined
       ? {
-          showDownload,
-        }
+        showDownload,
+      }
       : {}),
-
     ...(downloadPlacement
       ? {
-          downloadPlacement,
-        }
+        downloadPlacement,
+      }
       : {}),
-
     ...(customStyles
       ? {
-          rendererCustomStyles: customStyles,
-        }
+        rendererCustomStyles: customStyles,
+      }
       : {}),
-
     effect: resolveEffect(effect),
-
     ...(className
       ? {
-          className,
-        }
+        className,
+      }
       : {}),
-
     ...(testId
       ? {
-          testId,
-        }
+        testId,
+      }
       : {}),
   };
 };

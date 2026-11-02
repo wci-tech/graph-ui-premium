@@ -8,29 +8,20 @@ import type { LineChartProps } from '../LineChart.types';
 
 import { createLineChartDefinition, getResolvedLineChartColors } from './BaseLineChart.utils';
 
-type BaseLineChartProps = LineChartProps & {
-  readonly resolvedColors?: string[];
-};
-
 const BaseLineChart = ({
   data,
   labels,
   series,
   options,
   appearance = 'solid',
-
   showDownload = true,
   downloadPlacement = 'top-right',
   rendererCustomStyles,
-
   customStyles,
   className,
   testId = 'uplot-line-chart-test-id',
-
-  resolvedColors: variantColors = [],
-}: BaseLineChartProps) => {
+}: LineChartProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-
   const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
@@ -38,8 +29,8 @@ const BaseLineChart = ({
   }, [customStyles?.wrapper, rendererCustomStyles?.container]);
 
   const resolvedColors = useMemo(
-    () => getResolvedLineChartColors(rootElement, variantColors),
-    [rootElement, variantColors, customStyles?.wrapper, rendererCustomStyles?.container],
+    () => getResolvedLineChartColors(rootElement),
+    [rootElement, customStyles?.wrapper, rendererCustomStyles?.container],
   );
 
   const normalizedData = useMemo(

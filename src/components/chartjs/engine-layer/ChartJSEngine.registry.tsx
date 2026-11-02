@@ -11,6 +11,7 @@ import {
   GanttChart,
   GaugeMeter,
   HeatmapChart,
+  LineChart,
   NetworkGraph,
   PieChart,
   RadarChart,
@@ -32,6 +33,7 @@ import { adaptChartJSFunnelProps } from './adapters/funnel.adapter';
 import { adaptChartJSGanttProps } from './adapters/gantt.adapter';
 import { adaptChartJSGaugeMeterProps } from './adapters/gauge-meter.adapter';
 import { adaptChartJSHeatmapProps } from './adapters/heatmap.adapter';
+import { adaptChartJSLineProps } from './adapters/line.adapter';
 import { adaptChartJSNetworkGraphProps } from './adapters/network.adapter';
 import { adaptChartJSPieProps } from './adapters/pieChart.adapter';
 import { adaptChartJSRadarProps } from './adapters/radarChart.adapter';
@@ -77,6 +79,9 @@ export const CHARTJS_ENGINE_REGISTRY: EngineRegistry = {
   },
   heatmap: {
     render: (props) => <HeatmapChart {...adaptChartJSHeatmapProps(props)} />,
+  },
+  line: {
+    render: (props) => <LineChart {...adaptChartJSLineProps(props)} />,
   },
   network: {
     render: (props) => <NetworkGraph {...adaptChartJSNetworkGraphProps(props)} />,

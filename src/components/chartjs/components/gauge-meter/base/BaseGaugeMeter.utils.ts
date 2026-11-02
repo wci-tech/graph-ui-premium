@@ -92,8 +92,8 @@ const resolveTokenColor = (
 
 const resolveSeriesColors = (
   styles: CSSStyleDeclaration,
-  colors?: readonly string[],
-): readonly string[] =>
+  colors?: string[],
+): string[] =>
   colors?.length
     ? colors.map((color) => resolveColor(styles, color))
     : CHART_COLOR_VARIABLES.map((variableName) =>

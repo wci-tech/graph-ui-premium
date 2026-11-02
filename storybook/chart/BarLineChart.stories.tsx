@@ -14,7 +14,12 @@ import {
 } from '@wci-tech/core-ui-premium';
 
 import { Chart } from '@/charts/Chart';
-import type { ChartEffect } from '@/engines/engine.types';
+import type {
+  ChartBarLineColors,
+  ChartData,
+  ChartEffect,
+  ChartOptions,
+} from '@/engines/engine.types';
 
 const meta: Meta<typeof Chart> = {
   title: 'components/Charts/BarLineChart',
@@ -26,7 +31,7 @@ const meta: Meta<typeof Chart> = {
 
 export default meta;
 
-const commonData = {
+const commonData: ChartData = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   series: [
     {
@@ -40,7 +45,7 @@ const commonData = {
   ],
 };
 
-const matchingBarLineData = {
+const matchingBarLineData: ChartData = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   series: [
     {
@@ -54,7 +59,7 @@ const matchingBarLineData = {
   ],
 };
 
-const quarterlyData = {
+const quarterlyData: ChartData = {
   labels: ['Q1', 'Q2', 'Q3', 'Q4'],
   series: [
     {
@@ -68,7 +73,7 @@ const quarterlyData = {
   ],
 };
 
-const customColorData = {
+const customColorData: ChartData = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   series: [
     {
@@ -84,7 +89,7 @@ const customColorData = {
   ],
 };
 
-const trendData = {
+const trendData: ChartData = {
   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   series: [
     {
@@ -371,37 +376,35 @@ type ChartCardProps = {
   readonly children: ReactNode;
 };
 
-const ChartCard = ({ chartName, description, api, children }: ChartCardProps) => {
-  return (
-    <Box customStyles={chartCard}>
-      <FlexLayout direction="column" gap="12px">
-        <Typography variant="span" customStyles={chartNamePill}>
-          {chartName}
+const ChartCard = ({ chartName, description, api, children }: ChartCardProps) => (
+  <Box customStyles={chartCard}>
+    <FlexLayout direction="column" gap="12px">
+      <Typography variant="span" customStyles={chartNamePill}>
+        {chartName}
+      </Typography>
+
+      {description ? (
+        <Typography
+          variant="p"
+          customStyles={css`
+            ${paragraphSmall};
+            color: var(--wci-gray-700);
+          `}
+        >
+          {description}
         </Typography>
+      ) : null}
 
-        {description ? (
-          <Typography
-            variant="p"
-            customStyles={css`
-              ${paragraphSmall};
-              color: var(--wci-gray-700);
-            `}
-          >
-            {description}
-          </Typography>
-        ) : null}
+      {api ? (
+        <Typography variant="span" customStyles={apiPill}>
+          {api}
+        </Typography>
+      ) : null}
 
-        {api ? (
-          <Typography variant="span" customStyles={apiPill}>
-            {api}
-          </Typography>
-        ) : null}
-
-        <div css={chartShell}>{children}</div>
-      </FlexLayout>
-    </Box>
-  );
-};
+      <div css={chartShell}>{children}</div>
+    </FlexLayout>
+  </Box>
+);
 
 const ComparisonGrid = ({ children }: { readonly children: ReactNode }) => (
   <FlexLayout
@@ -430,23 +433,12 @@ const ComparisonItem = ({ children }: { readonly children: ReactNode }) => (
 );
 
 type BarLineComparisonProps = {
-  readonly data?: typeof commonData;
+  readonly data?: ChartData;
   readonly appearance?: 'basic' | 'smooth';
   readonly effect?: ChartEffect;
-  readonly chartJSOptions?: Record<string, unknown>;
-  readonly eChartsOptions?: Record<string, unknown>;
-  readonly colors?: {
-    readonly series?: readonly string[];
-    readonly axisText?: string;
-    readonly axisLine?: string;
-    readonly grid?: string;
-    readonly tooltipBackground?: string;
-    readonly tooltipText?: string;
-    readonly tooltipBorder?: string;
-    readonly trendUp?: string;
-    readonly trendDown?: string;
-    readonly trendNeutral?: string;
-  };
+  readonly chartJSOptions?: ChartOptions;
+  readonly eChartsOptions?: ChartOptions;
+  readonly colors?: ChartBarLineColors;
 };
 
 const BarLineComparison = ({
@@ -456,59 +448,61 @@ const BarLineComparison = ({
   chartJSOptions,
   eChartsOptions,
   colors,
-}: BarLineComparisonProps) => (
-  <ComparisonGrid>
-    <ComparisonItem>
-      <ChartCard
-        chartName="Chart.js"
-        description="Bar-Line chart rendered using the Chart.js engine."
-        api={`appearance="${appearance}" effect="${effect}"`}
-      >
-        <Chart
-          {...compactObject({
-            type: 'bar-line' as const,
-            engine: 'chart-1' as const,
-            data,
-            appearance,
-            effect,
-            colors,
-            options: {
-              barWidth: 44,
-              showLegend: true,
-              ...chartJSOptions,
-            },
-          })}
-        />
-      </ChartCard>
-    </ComparisonItem>
+}: BarLineComparisonProps) => {
+  const chartJSProps = compactObject({
+    type: 'bar-line' as const,
+    engine: 'chart-1' as const,
+    data,
+    appearance,
+    effect,
+    colors,
+    options: {
+      barWidth: 44,
+      showLegend: true,
+      ...chartJSOptions,
+    },
+  });
 
-    <ComparisonItem>
-      <ChartCard
-        chartName="ECharts"
-        description="Bar-Line chart rendered using the ECharts engine."
-        api={`appearance="${appearance}" effect="${effect}"`}
-      >
-        <Chart
-          {...compactObject({
-            type: 'bar-line' as const,
-            engine: 'chart-2' as const,
-            data,
-            appearance,
-            effect,
-            colors,
-            options: {
-              barWidth: 44,
-              legend: {
-                show: true,
-              },
-              ...eChartsOptions,
-            },
-          })}
-        />
-      </ChartCard>
-    </ComparisonItem>
-  </ComparisonGrid>
-);
+  const eChartsProps = compactObject({
+    type: 'bar-line' as const,
+    engine: 'chart-2' as const,
+    data,
+    appearance,
+    effect,
+    colors,
+    options: {
+      barWidth: 44,
+      legend: {
+        show: true,
+      },
+      ...eChartsOptions,
+    },
+  });
+
+  return (
+    <ComparisonGrid>
+      <ComparisonItem>
+        <ChartCard
+          chartName="Chart.js"
+          description="Bar-Line chart rendered using the Chart.js engine."
+          api={`appearance="${appearance}" effect="${effect}"`}
+        >
+          <Chart {...chartJSProps} />
+        </ChartCard>
+      </ComparisonItem>
+
+      <ComparisonItem>
+        <ChartCard
+          chartName="ECharts"
+          description="Bar-Line chart rendered using the ECharts engine."
+          api={`appearance="${appearance}" effect="${effect}"`}
+        >
+          <Chart {...eChartsProps} />
+        </ChartCard>
+      </ComparisonItem>
+    </ComparisonGrid>
+  );
+};
 
 type BarLineEffectComparisonProps = {
   readonly title: string;
@@ -834,7 +828,7 @@ export const CustomCSSVariables = () => (
       <PageIntro
         title="Bar Line CSS Variables"
         description="The shared chart CSS variables are overridden once and consumed by both rendering engines."
-        statValue="15"
+        statValue="12"
         statLabel="CSS Variables"
         secondaryStatValue="2"
         secondaryStatLabel="Engines"
@@ -843,7 +837,7 @@ export const CustomCSSVariables = () => (
       <section css={pageSection}>
         <SectionHeading
           title="Shared CSS Variables"
-          description="Series palette, semantic trend states, axes, grid, and tooltip colors are overridden through the shared chart variables."
+          description="Series palette, axes, grid, and tooltip colors are overridden through the shared chart variables."
         />
 
         <div css={customChartVariables}>

@@ -69,6 +69,7 @@ export interface ChartScatterPoint {
   readonly x: number;
   readonly y: number;
 }
+
 export type ChartSeriesData =
   | readonly number[]
   | readonly ChartScatterPoint[]
@@ -116,6 +117,12 @@ export type ChartColors = {
   readonly tooltipBackground?: string;
   readonly tooltipText?: string;
   readonly tooltipBorder?: string;
+};
+
+export type ChartBarLineColors = ChartColors & {
+  readonly trendUp?: string;
+  readonly trendDown?: string;
+  readonly trendNeutral?: string;
 };
 
 export type ChartCandlestickColors = ChartColors & {
@@ -190,8 +197,13 @@ type BaseChartProps = {
 };
 
 export type StandardChartProps = BaseChartProps & {
-  readonly type: Exclude<ChartType, 'candlestick'>;
+  readonly type: Exclude<ChartType, 'bar-line' | 'candlestick'>;
   readonly colors?: ChartColors;
+};
+
+export type BarLineChartProps = BaseChartProps & {
+  readonly type: 'bar-line';
+  readonly colors?: ChartBarLineColors;
 };
 
 export type CandlestickChartProps = BaseChartProps & {
@@ -201,6 +213,7 @@ export type CandlestickChartProps = BaseChartProps & {
 
 export type ChartProps =
   | StandardChartProps
+  | BarLineChartProps
   | CandlestickChartProps;
 
 export type EngineRendererProps = ChartProps & {

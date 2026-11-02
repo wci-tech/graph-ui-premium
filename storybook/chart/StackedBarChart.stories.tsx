@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { css } from '@emotion/react';
 import type { Meta } from '@storybook/react';
 import { Box, FlexItem, FlexLayout, responsive, Typography } from '@wci-tech/core-ui-premium';
-
+import type { ChartColors } from '@/engines/engine.types';
 import { Chart } from '@/charts/Chart';
 import type { ChartData } from '@/charts/Chart.types';
 
@@ -132,7 +132,11 @@ const denseData: ChartData = {
 /* Shared colors                                                               */
 /* -------------------------------------------------------------------------- */
 
-const customColors = {
+/* -------------------------------------------------------------------------- */
+/* Shared colors                                                               */
+/* -------------------------------------------------------------------------- */
+
+const customColors: ChartColors = {
   series: ['#f5456e', '#3d9eff', '#59cc26', '#ffae00', '#ff784d'],
   axisText: '#111827',
   axisLine: '#cbd5e1',
@@ -140,9 +144,9 @@ const customColors = {
   tooltipBackground: '#ffffff',
   tooltipText: '#111827',
   tooltipBorder: '#e2e8f0',
-} as const;
+};
 
-const darkColors = {
+const darkColors: ChartColors = {
   series: ['#fb7185', '#60a5fa', '#86efac', '#fbbf24', '#fb923c'],
   axisText: '#f8fafc',
   axisLine: '#475569',
@@ -150,7 +154,7 @@ const darkColors = {
   tooltipBackground: '#020617',
   tooltipText: '#ffffff',
   tooltipBorder: '#334155',
-} as const;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Styles                                                                      */

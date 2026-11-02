@@ -1,6 +1,7 @@
 import type { ReactNode, RefObject } from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
+import type { Plugin } from 'chart.js';
 
 import type {
   ChartJSData,
@@ -16,7 +17,7 @@ import type {
 export type GaugeMeterEffect = ChartJSEffect;
 
 export interface GaugeMeterColors {
-  readonly series?: readonly string[];
+  readonly series?: string[];
   readonly needle?: string;
   readonly label?: string;
   readonly score?: string;
@@ -26,8 +27,7 @@ export interface GaugeMeterColors {
   readonly tooltipBorder?: string;
 }
 
-export type GaugeMeterResolvedColors =
-  Required<GaugeMeterColors>;
+export type GaugeMeterResolvedColors = Required<GaugeMeterColors>;
 
 export interface GaugeMeterCustomStyles {
   readonly wrapper?: StyleType;
@@ -105,7 +105,7 @@ export interface GaugeMeterHookReturn {
   readonly wrapperRef: RefObject<HTMLDivElement | null>;
   readonly processedData: ChartJSData;
   readonly gaugeOptions: ChartjsProps['options'] | undefined;
-  readonly plugins: NonNullable<ChartjsProps['plugins']>;
+  readonly plugins: Plugin<'doughnut'>[];
   readonly wrapperProps: GaugeMeterWrapperProps;
   readonly resolvedColors: GaugeMeterResolvedColors | undefined;
   readonly resolvedValue: number;

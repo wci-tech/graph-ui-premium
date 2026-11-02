@@ -3,6 +3,13 @@ import { compactObject } from '@wci-tech/core-ui-premium';
 import type { UPlotDefinition, UPlotSeriesDefinition } from '../../../UPlot.types';
 import type { LineChartData } from '../LineChart.types';
 
+import {
+  LINE_CHART_COLOR_VARIABLES,
+  LINE_CHART_FALLBACK_COLORS,
+  LINE_CHART_FALLBACK_TOKENS,
+  LINE_CHART_TOKEN_VARIABLES,
+} from './BaseLineChart.constant';
+
 const EMPTY_SERIES: UPlotSeriesDefinition[] = [];
 
 export type ResolvedLineChartColors = {
@@ -12,7 +19,7 @@ export type ResolvedLineChartColors = {
   readonly pointFillColor: string;
 };
 
-const getCssVariable = (
+const resolveCssVariable = (
   element: HTMLElement | null,
   variableName: string,
   fallback: string,
@@ -26,15 +33,25 @@ const getCssVariable = (
 
 export const getResolvedLineChartColors = (
   element: HTMLElement | null,
-  variantColors: readonly string[] = [],
 ): ResolvedLineChartColors => ({
-  colors: [
-    getCssVariable(element, '--line-chart-line-color', variantColors[0] ?? '#763d6c'),
-    getCssVariable(element, '--line-chart-secondary-line-color', variantColors[1] ?? '#316851'),
-  ],
-  axisColor: getCssVariable(element, '--line-chart-axis-color', '#6b7280'),
-  gridColor: getCssVariable(element, '--line-chart-grid-color', '#e5e7eb'),
-  pointFillColor: getCssVariable(element, '--line-chart-point-bg-color', '#ffffff'),
+  colors: LINE_CHART_COLOR_VARIABLES.map((variable, index) =>
+    resolveCssVariable(element, variable, LINE_CHART_FALLBACK_COLORS[index]),
+  ),
+  axisColor: resolveCssVariable(
+    element,
+    LINE_CHART_TOKEN_VARIABLES.axisText,
+    LINE_CHART_FALLBACK_TOKENS.axisText,
+  ),
+  gridColor: resolveCssVariable(
+    element,
+    LINE_CHART_TOKEN_VARIABLES.grid,
+    LINE_CHART_FALLBACK_TOKENS.grid,
+  ),
+  pointFillColor: resolveCssVariable(
+    element,
+    LINE_CHART_TOKEN_VARIABLES.pointFill,
+    LINE_CHART_FALLBACK_TOKENS.pointFill,
+  ),
 });
 
 export const isSeriesArray = (
