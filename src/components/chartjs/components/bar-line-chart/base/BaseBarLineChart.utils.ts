@@ -425,6 +425,8 @@ export const createBarLineChartOptions = ({
   const legendLabels = getNestedRecord(legend, 'labels');
   const tooltip = getNestedRecord(plugins, 'tooltip');
   const tooltipCallbacks = getNestedRecord(tooltip, 'callbacks');
+  const crosshair = getNestedRecord(plugins, 'crosshair');
+  const datalabels = getNestedRecord(plugins, 'datalabels');
 
   const interaction = getNestedRecord(options, 'interaction');
   const layout = getNestedRecord(options, 'layout');
@@ -438,14 +440,10 @@ export const createBarLineChartOptions = ({
   const yBorder = getNestedRecord(yScale, 'border');
   const yTicks = getNestedRecord(yScale, 'ticks');
 
-  const crosshair = getNestedRecord(plugins, 'crosshair');
-  const candlestickCrosshair = getNestedRecord(
-    plugins,
-    'candlestickCrosshair',
-  );
-  const datalabels = getNestedRecord(plugins, 'datalabels');
-
-  const crosshairEnabled = options?.crosshair ?? false;
+  const xFontSize = options?.fontSize?.x;
+  const yFontSize = options?.fontSize?.y;
+  const crosshairEnabled = options?.crosshair === true;
+  const labelWeight = options?.boldLabels ? 'bold' : 'normal';
 
   return {
     ...options,
@@ -461,25 +459,23 @@ export const createBarLineChartOptions = ({
     },
 
     interaction: {
-      mode: 'index',
-      intersect: false,
-      axis: 'x',
+      mode: crosshairEnabled ? 'index' : 'nearest',
+      intersect: !crosshairEnabled,
+      ...(crosshairEnabled ? { axis: 'x' } : {}),
       ...interaction,
     },
 
     plugins: {
       ...plugins,
-
       crosshair: {
         enabled: crosshairEnabled,
+        color: colors.axisText,
+        lineWidth: 1,
+        lineDash: [4, 4],
+        showVertical: true,
+        showHorizontal: true,
         ...crosshair,
       },
-
-      candlestickCrosshair: {
-        enabled: crosshairEnabled,
-        ...candlestickCrosshair,
-      },
-
       legend: {
         display: options?.showLegend ?? true,
         position: 'top',
@@ -493,11 +489,10 @@ export const createBarLineChartOptions = ({
           ...legendLabels,
         },
       },
-
       tooltip: {
         enabled: true,
-        mode: 'index',
-        intersect: false,
+        mode: crosshairEnabled ? 'index' : 'nearest',
+        intersect: !crosshairEnabled,
         position: 'nearest',
         caretPadding: BAR_LINE_CHART_CONFIG.tooltipCaretPadding,
         backgroundColor: colors.tooltipBackground,
@@ -510,7 +505,6 @@ export const createBarLineChartOptions = ({
           ...tooltipCallbacks,
         },
       },
-
       datalabels: {
         display: false,
         ...datalabels,
@@ -519,23 +513,19 @@ export const createBarLineChartOptions = ({
 
     scales: {
       ...scales,
-
       x: {
         ...xScale,
         display: true,
         offset: true,
-
         grid: {
           display: false,
           color: colors.grid,
           ...xGrid,
         },
-
         border: {
           color: colors.axisLine,
           ...xBorder,
         },
-
         ticks: {
           display: true,
           color: colors.axisText,
@@ -544,32 +534,30 @@ export const createBarLineChartOptions = ({
           minRotation: 0,
           padding: BAR_LINE_CHART_CONFIG.xTickPadding,
           font: {
-            weight: options?.boldLabels ? 'bold' : 'normal',
+            weight: labelWeight,
+            ...(xFontSize !== undefined ? { size: xFontSize } : {}),
           },
           ...xTicks,
         },
       },
-
       y: {
         ...yScale,
         display: true,
         beginAtZero: true,
-
         grid: {
           color: colors.grid,
           ...yGrid,
         },
-
         border: {
           color: colors.axisLine,
           ...yBorder,
         },
-
         ticks: {
           display: true,
           color: colors.axisText,
           font: {
-            weight: options?.boldLabels ? 'bold' : 'normal',
+            weight: labelWeight,
+            ...(yFontSize !== undefined ? { size: yFontSize } : {}),
           },
           ...yTicks,
         },

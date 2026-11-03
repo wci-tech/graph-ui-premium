@@ -421,6 +421,10 @@ export const CustomStyles = () => (
                 boldLegends: true,
                 xAxisTitle: 'Market Share (%)',
                 yAxisTitle: 'Growth Rate (%)',
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
                 onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
                   const firstElement = elements[0];
 

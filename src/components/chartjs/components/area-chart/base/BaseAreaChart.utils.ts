@@ -312,7 +312,6 @@ export const createAreaChartOptions = ({
   const optionRecord = isRecord(options) ? options : undefined;
 
   const scalesConfig = getRecordConfig(optionRecord, 'scales');
-
   const xScaleConfig = getRecordConfig(scalesConfig, 'x');
   const yScaleConfig = getRecordConfig(scalesConfig, 'y');
 
@@ -334,77 +333,64 @@ export const createAreaChartOptions = ({
   const tooltipCallbacksConfig = getRecordConfig(tooltipConfig, 'callbacks');
 
   const datalabelsConfig = getRecordConfig(pluginOptions, 'datalabels');
-
   const crosshairConfig = getRecordConfig(pluginOptions, 'crosshair');
-
-  const candlestickCrosshairConfig = getRecordConfig(pluginOptions, 'candlestickCrosshair');
-
   const interactionConfig = getRecordConfig(optionRecord, 'interaction');
 
-  const crosshairEnabled = options?.crosshair ?? false;
+  const xFontSize = options?.fontSize?.x;
+  const yFontSize = options?.fontSize?.y;
+  const crosshairEnabled = options?.crosshair === true;
 
   return {
     ...options,
-
     responsive: true,
     maintainAspectRatio: false,
     fill: true,
 
     interaction: {
-      mode: 'nearest',
-      intersect: true,
+      mode: crosshairEnabled ? 'index' : 'nearest',
+      intersect: !crosshairEnabled,
+      ...(crosshairEnabled ? { axis: 'x' } : {}),
       ...interactionConfig,
     },
 
     scales: {
       ...scalesConfig,
-
       x: {
         ...xScaleConfig,
-
         grid: {
           display: false,
           ...xGridConfig,
         },
-
         border: {
           color: colors.axisLine,
           ...xBorderConfig,
         },
-
         ticks: {
           color: colors.axisText,
-
           font: {
             weight: options?.boldLabels ? 'bold' : 'normal',
+            ...(xFontSize !== undefined ? { size: xFontSize } : {}),
           },
-
           ...xTicksConfig,
         },
       },
-
       y: {
         ...yScaleConfig,
-
         beginAtZero: true,
-
         grid: {
           color: colors.grid,
           ...yGridConfig,
         },
-
         border: {
           color: colors.axisLine,
           ...yBorderConfig,
         },
-
         ticks: {
           color: colors.axisText,
-
           font: {
             weight: options?.boldLabels ? 'bold' : 'normal',
+            ...(yFontSize !== undefined ? { size: yFontSize } : {}),
           },
-
           ...yTicksConfig,
         },
       },
@@ -412,58 +398,44 @@ export const createAreaChartOptions = ({
 
     plugins: {
       ...pluginOptions,
-
       crosshair: {
         enabled: crosshairEnabled,
+        color: colors.axisText,
+        lineWidth: 1,
+        lineDash: [4, 4],
+        showVertical: true,
+        showHorizontal: true,
         ...crosshairConfig,
       },
-
-      candlestickCrosshair: {
-        enabled: crosshairEnabled,
-        ...candlestickCrosshairConfig,
-      },
-
       legend: {
         display: options?.showLegend ?? false,
         position: 'top',
         align: 'center',
-
         ...legendConfig,
-
         labels: {
           color: colors.axisText,
           ...legendLabelsConfig,
         },
       },
-
       tooltip: {
-        mode: 'nearest',
-        intersect: true,
+        mode: crosshairEnabled ? 'index' : 'nearest',
+        intersect: !crosshairEnabled,
         position: 'nearest',
-
         caretPadding: AREA_CHART_CONFIG.tooltipCaretPadding,
-
         backgroundColor: colors.tooltipBackground,
-
         titleColor: colors.tooltipText,
-
         bodyColor: colors.tooltipText,
-
         borderColor: colors.tooltipBorder,
-
         ...tooltipConfig,
-
         callbacks: {
           label: (context: TooltipItem<'line'>) => {
             const datasetLabel = context.dataset.label ?? 'Dataset';
 
             return `${datasetLabel}: ${context.formattedValue}`;
           },
-
           ...tooltipCallbacksConfig,
         },
       },
-
       datalabels: {
         display: false,
         ...datalabelsConfig,

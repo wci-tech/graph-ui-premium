@@ -194,7 +194,6 @@ export const Default = () => (
         <AreaChart
           {...mockData}
           effect="none"
-          showDownload={false}
           customStyles={{
             wrapper: defaultChartWrapper,
           }}
@@ -515,7 +514,7 @@ export const CustomStyles = () => (
       </Typography>
 
       <FlexLayout columns={12} gap={{ default: '24px', md: '32px' }} wrap="wrap">
-        <FlexItem columnSpan={{ default: 12, md: 6 }}>
+        <FlexItem columnSpan={{ default: 12 }}>
           <ChartCard
             title="Custom Colors and Interaction"
             description="Uses the AreaChart color API for chart colors while customStyles remains responsible for structural styling."
@@ -537,7 +536,7 @@ export const CustomStyles = () => (
               ]}
               effect="none"
               colors={{
-                axisText: 'yellow',
+                axisText: 'blue',
                 axisLine: 'orange',
                 grid: 'red',
                 tooltipBackground: 'var(--wci-chart-tooltip-background)',
@@ -550,7 +549,10 @@ export const CustomStyles = () => (
               options={{
                 chartBackground: 'var(--wci-surface-raised)',
                 boldLabels: true,
-
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
                 onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
                   const firstElement = elements[0];
 
@@ -571,7 +573,7 @@ export const CustomStyles = () => (
           </ChartCard>
         </FlexItem>
 
-        <FlexItem columnSpan={{ default: 12, md: 6 }}>
+        <FlexItem columnSpan={{ default: 12 }}>
           <ChartCard
             title="Minimalist Stacked View"
             description="A compact stacked chart with hidden y-axis and simplified grid rendering."
@@ -581,6 +583,10 @@ export const CustomStyles = () => (
               {...mockData}
               options={{
                 isBoxVisible: false,
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
 
                 scales: {
                   y: {

@@ -35,7 +35,7 @@ const getWrapperStyles = (
 
   min-width: 0;
 
-  overflow: hidden;
+  
 
   background-color: var(
     --bar-line-chart-bg-color,

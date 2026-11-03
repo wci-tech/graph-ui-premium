@@ -717,11 +717,12 @@ type AreaEffectComparisonProps = {
 
   readonly chart2Effect:
     | 'none'
-    | 'line-reveal'
-    | 'line-elastic'
-    | 'line-bounce'
-    | 'line-stagger'
-    | 'line-smooth-update';
+    | 'bounce'
+    | 'wobble'
+    | 'elastic'
+    | 'progressive-trace'
+    | 'elastic-glide'
+    | 'staggered-reveal';
 
   readonly useMultipleSeries?: boolean;
 };
@@ -809,7 +810,7 @@ export const RevealEffect = () => (
     chart1Description="Chart 1 progressively traces the area line from the first data point to the last."
     chart1Effect="progressive-trace"
     chart2Description="Chart 2 sequentially reveals the line, data points, and filled area."
-    chart2Effect="line-reveal"
+    chart2Effect="staggered-reveal"
   />
 );
 
@@ -820,7 +821,7 @@ export const BounceEffect = () => (
     chart1Description="Chart 1 introduces the area series using its bounce entrance animation."
     chart1Effect="bounce"
     chart2Description="Chart 2 applies bounce easing while revealing the area line."
-    chart2Effect="line-bounce"
+    chart2Effect="bounce"
   />
 );
 
@@ -831,7 +832,7 @@ export const ElasticEffect = () => (
     chart1Description="Chart 1 reveals the area series using elastic motion."
     chart1Effect="elastic"
     chart2Description="Chart 2 uses elastic easing while drawing the area line."
-    chart2Effect="line-elastic"
+    chart2Effect="elastic"
   />
 );
 
@@ -842,7 +843,7 @@ export const StaggerEffect = () => (
     chart1Description="Chart 1 delays the entrance of each series and its data-point sequence."
     chart1Effect="staggered-reveal"
     chart2Description="Chart 2 applies delayed animation to each series and data point."
-    chart2Effect="line-stagger"
+    chart2Effect="staggered-reveal"
     useMultipleSeries
   />
 );
@@ -854,7 +855,7 @@ export const MotionEffect = () => (
     chart1Description="Chart 1 introduces the area series with a short wobble movement."
     chart1Effect="wobble"
     chart2Description="Chart 2 smoothly transitions the area series when its data is updated."
-    chart2Effect="line-smooth-update"
+    chart2Effect="wobble"
   />
 );
 
@@ -865,7 +866,7 @@ export const GlideEffect = () => (
     chart1Description="Chart 1 combines elastic easing with a smooth gliding entrance."
     chart1Effect="elastic-glide"
     chart2Description="Chart 2 uses smooth interpolation to transition the rendered line."
-    chart2Effect="line-smooth-update"
+    chart2Effect="staggered-reveal"
   />
 );
 

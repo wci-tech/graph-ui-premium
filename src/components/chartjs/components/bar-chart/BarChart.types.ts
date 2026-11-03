@@ -1,10 +1,20 @@
-import type { ReactNode, RefObject } from 'react';
+import type {
+  ReactNode,
+  RefObject,
+} from 'react';
 
 import type { StyleType } from '@wci-tech/core-ui-premium';
 
-import type { ChartJSData, ChartJSOptions, ChartjsProps } from '@/components/chartjs/ChartJS.types';
+import type {
+  ChartJSData,
+  ChartJSOptions,
+  ChartjsProps,
+} from '@/components/chartjs/ChartJS.types';
 import type { ChartJSEffect } from '@/components/chartjs/common-effects';
-import type { ChartCustomStyles, DownloadPlacement } from '@/engines/engine.types';
+import type {
+  ChartCustomStyles,
+  DownloadPlacement,
+} from '@/engines/engine.types';
 
 export type BarChartEffect = ChartJSEffect;
 
@@ -144,7 +154,8 @@ export interface BarChartWrapperProps {
 export interface BarChartHookReturn {
   readonly wrapperRef: RefObject<HTMLDivElement | null>;
   readonly processedData: ChartJSData;
-  readonly barOptions: ChartjsProps['options'] | undefined;
+  readonly barOptions: ChartJSOptions | undefined;
+  readonly plugins: NonNullable<ChartjsProps['plugins']>;
   readonly wrapperProps: BarChartWrapperProps;
   readonly isReady: boolean;
 }

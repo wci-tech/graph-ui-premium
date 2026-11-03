@@ -224,7 +224,7 @@ export const Default = () => (
         <BarChart
           {...mockData}
           effect="none"
-          showDownload={false}
+          showDownload={true}
           customStyles={{
             wrapper: defaultChartWrapper,
           }}
@@ -859,7 +859,7 @@ export const CustomStyles = () => (
               ]}
               effect="none"
               colors={{
-                axisText: 'yellow',
+                axisText: 'blue',
                 axisLine: 'orange',
                 grid: 'red',
                 tooltipBackground: 'var(--wci-chart-tooltip-background)',
@@ -874,6 +874,10 @@ export const CustomStyles = () => (
                 chartBackground: 'var(--wci-surface-raised)',
                 boldLabels: true,
                 boldLegends: true,
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
 
                 onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
                   const firstElement = elements[0];
@@ -907,6 +911,10 @@ export const CustomStyles = () => (
                 horizontal: true,
                 isBoxVisible: false,
                 barWidth: 22,
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
 
                 scales: {
                   x: {

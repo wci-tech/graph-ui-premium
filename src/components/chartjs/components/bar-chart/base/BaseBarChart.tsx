@@ -25,7 +25,7 @@ export const BaseBarChart = ({
 }: BaseBarChartProps) => {
   const styles = useStyles(options);
 
-  const { wrapperRef, processedData, barOptions, wrapperProps, isReady } = useBarChart(
+  const { wrapperRef, processedData, barOptions, plugins, wrapperProps, isReady } = useBarChart(
     compactObject({
       data,
       labels,
@@ -49,6 +49,7 @@ export const BaseBarChart = ({
     type: 'bar' as const,
     data: processedData,
     options: barOptions,
+    plugins,
     showDownload,
     downloadPlacement,
     customStyles: rendererCustomStyles,
