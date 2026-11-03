@@ -240,7 +240,7 @@ export const Default = () => (
       />
 
       <Box customStyles={heroBox}>
-        <BarLineChart {...mockData} effect="none" />
+        <BarLineChart {...mockData} effect="none" showDownload={true} />
       </Box>
     </div>
   </main>
@@ -727,6 +727,10 @@ export const CustomStyles = () => (
                 barWidth: 36,
                 boldLabels: true,
                 boldLegends: true,
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
               }}
             />
           </ChartCard>
@@ -763,6 +767,10 @@ export const CustomStyles = () => (
                 barWidth: 36,
                 boldLabels: true,
                 boldLegends: true,
+                fontSize: {
+                  x: 16,
+                  y: 16,
+                },
               }}
             />
           </ChartCard>

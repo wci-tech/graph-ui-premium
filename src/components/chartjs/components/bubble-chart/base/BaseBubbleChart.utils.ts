@@ -204,17 +204,23 @@ export const createBubbleChartOptions = ({
   readonly colors: BubbleChartResolvedColors;
 }): ChartJSOptions => {
   const optionRecord = isRecord(options) ? options : undefined;
+
   const scalesConfig = getRecordConfig(optionRecord, 'scales');
   const xScaleConfig = getRecordConfig(scalesConfig, 'x');
   const yScaleConfig = getRecordConfig(scalesConfig, 'y');
+
   const xTitleConfig = getRecordConfig(xScaleConfig, 'title');
   const yTitleConfig = getRecordConfig(yScaleConfig, 'title');
+
   const xGridConfig = getRecordConfig(xScaleConfig, 'grid');
   const yGridConfig = getRecordConfig(yScaleConfig, 'grid');
+
   const xBorderConfig = getRecordConfig(xScaleConfig, 'border');
   const yBorderConfig = getRecordConfig(yScaleConfig, 'border');
+
   const xTicksConfig = getRecordConfig(xScaleConfig, 'ticks');
   const yTicksConfig = getRecordConfig(yScaleConfig, 'ticks');
+
   const pluginOptions = getRecordConfig(optionRecord, 'plugins');
   const legendConfig = getRecordConfig(pluginOptions, 'legend');
   const legendLabelsConfig = getRecordConfig(legendConfig, 'labels');
@@ -222,28 +228,32 @@ export const createBubbleChartOptions = ({
   const tooltipCallbacksConfig = getRecordConfig(tooltipConfig, 'callbacks');
   const datalabelsConfig = getRecordConfig(pluginOptions, 'datalabels');
   const crosshairConfig = getRecordConfig(pluginOptions, 'crosshair');
-  const candlestickCrosshairConfig = getRecordConfig(
-    pluginOptions,
-    'candlestickCrosshair',
-  );
+
   const interactionConfig = getRecordConfig(optionRecord, 'interaction');
   const layoutConfig = getRecordConfig(optionRecord, 'layout');
   const animationsConfig = getRecordConfig(optionRecord, 'animations');
-  const crosshairEnabled = options?.crosshair ?? false;
+
+  const xFontSize = options?.fontSize?.x;
+  const yFontSize = options?.fontSize?.y;
+  const crosshairEnabled = options?.crosshair === true;
+  const labelWeight = options?.boldLabels ? 'bold' : 'normal';
 
   return {
     ...options,
     responsive: true,
     maintainAspectRatio: false,
+
     layout: {
       padding: BUBBLE_CHART_CONFIG.layoutPadding,
       ...layoutConfig,
     },
+
     interaction: {
-      mode: 'nearest',
-      intersect: true,
+      mode: crosshairEnabled ? 'index' : 'nearest',
+      intersect: !crosshairEnabled,
       ...interactionConfig,
     },
+
     scales: {
       ...scalesConfig,
       x: {
@@ -267,7 +277,8 @@ export const createBubbleChartOptions = ({
         ticks: {
           color: colors.axisText,
           font: {
-            weight: options?.boldLabels ? 'bold' : 'normal',
+            weight: labelWeight,
+            ...(xFontSize !== undefined ? { size: xFontSize } : {}),
           },
           ...xTicksConfig,
         },
@@ -293,21 +304,24 @@ export const createBubbleChartOptions = ({
         ticks: {
           color: colors.axisText,
           font: {
-            weight: options?.boldLabels ? 'bold' : 'normal',
+            weight: labelWeight,
+            ...(yFontSize !== undefined ? { size: yFontSize } : {}),
           },
           ...yTicksConfig,
         },
       },
     },
+
     plugins: {
       ...pluginOptions,
       crosshair: {
         enabled: crosshairEnabled,
+        color: colors.axisText,
+        lineWidth: 1,
+        lineDash: [4, 4],
+        showVertical: true,
+        showHorizontal: true,
         ...crosshairConfig,
-      },
-      candlestickCrosshair: {
-        enabled: crosshairEnabled,
-        ...candlestickCrosshairConfig,
       },
       legend: {
         display: options?.showLegend ?? false,
@@ -323,8 +337,8 @@ export const createBubbleChartOptions = ({
         },
       },
       tooltip: {
-        mode: 'nearest',
-        intersect: true,
+        mode: crosshairEnabled ? 'index' : 'nearest',
+        intersect: !crosshairEnabled,
         position: 'nearest',
         caretPadding: BUBBLE_CHART_CONFIG.tooltipCaretPadding,
         backgroundColor: colors.tooltipBackground,
@@ -342,11 +356,7 @@ export const createBubbleChartOptions = ({
               const y = raw['y'];
               const r = raw['r'];
 
-              if (
-                typeof x === 'number' &&
-                typeof y === 'number' &&
-                typeof r === 'number'
-              ) {
+              if (typeof x === 'number' && typeof y === 'number' && typeof r === 'number') {
                 return `${datasetLabel}: x ${x}, y ${y}, radius ${r}`;
               }
             }
@@ -361,6 +371,7 @@ export const createBubbleChartOptions = ({
         ...datalabelsConfig,
       },
     },
+
     animations: {
       numbers: {
         type: 'number',
@@ -375,6 +386,7 @@ export const createBubbleChartOptions = ({
       },
       ...animationsConfig,
     },
+
     onClick: options?.['onClick'],
   };
 };

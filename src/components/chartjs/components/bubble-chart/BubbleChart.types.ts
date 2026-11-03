@@ -85,6 +85,7 @@ export interface BubbleChartWrapperProps {
 export interface BubbleChartHookReturn {
   readonly wrapperRef: RefObject<HTMLDivElement | null>;
   readonly processedData: ChartJSData;
+  readonly plugins: NonNullable<ChartjsProps['plugins']>;
   readonly bubbleOptions: ChartjsProps['options'] | undefined;
   readonly wrapperProps: BubbleChartWrapperProps;
   readonly isReady: boolean;

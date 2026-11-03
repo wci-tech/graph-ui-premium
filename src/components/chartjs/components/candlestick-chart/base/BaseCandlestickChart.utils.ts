@@ -282,133 +282,85 @@ export const createCandlestickChartOptions = ({
   readonly options?: CandlestickChartOptions;
   readonly colors: CandlestickChartResolvedColors;
 }): ChartJSOptions => {
-  const optionRecord = isRecord(options)
-    ? options
-    : undefined;
+  const optionRecord = isRecord(options) ? options : undefined;
 
-  const scalesConfig = getRecordConfig(
-    optionRecord,
-    'scales',
-  );
+  const scalesConfig = getRecordConfig(optionRecord, 'scales');
+  const xScaleConfig = getRecordConfig(scalesConfig, 'x');
+  const yScaleConfig = getRecordConfig(scalesConfig, 'y');
+  const volumeScaleConfig = getRecordConfig(scalesConfig, 'volume');
 
-  const xScaleConfig = getRecordConfig(
-    scalesConfig,
-    'x',
-  );
+  const pluginOptions = getRecordConfig(optionRecord, 'plugins');
+  const legendConfig = getRecordConfig(pluginOptions, 'legend');
+  const tooltipConfig = getRecordConfig(pluginOptions, 'tooltip');
 
-  const yScaleConfig = getRecordConfig(
-    scalesConfig,
-    'y',
-  );
-
-  const volumeScaleConfig = getRecordConfig(
-    scalesConfig,
-    'volume',
-  );
-
-  const pluginOptions = getRecordConfig(
-    optionRecord,
-    'plugins',
-  );
-
-  const legendConfig = getRecordConfig(
-    pluginOptions,
-    'legend',
-  );
-
-  const tooltipConfig = getRecordConfig(
-    pluginOptions,
-    'tooltip',
-  );
+  const xFontSize = options?.fontSize?.x;
+  const yFontSize = options?.fontSize?.y;
+  const labelWeight = options?.boldLabels ? 'bold' : 'normal';
 
   return {
     ...options,
     responsive: true,
     maintainAspectRatio: false,
     parsing: false,
+
     interaction: {
       mode: 'index',
       intersect: false,
       axis: 'x',
-      ...getRecordConfig(
-        optionRecord,
-        'interaction',
-      ),
+      ...getRecordConfig(optionRecord, 'interaction'),
     },
+
     scales: {
+      ...scalesConfig,
       x: {
         ...xScaleConfig,
         type: 'time',
         time: {
           unit: options?.timeUnit ?? 'day',
-          ...getRecordConfig(
-            xScaleConfig,
-            'time',
-          ),
+          ...getRecordConfig(xScaleConfig, 'time'),
         },
         border: {
           display: true,
           color: colors.axisLine,
-          ...getRecordConfig(
-            xScaleConfig,
-            'border',
-          ),
+          ...getRecordConfig(xScaleConfig, 'border'),
         },
         grid: {
           display: true,
           drawTicks: true,
           color: colors.grid,
-          ...getRecordConfig(
-            xScaleConfig,
-            'grid',
-          ),
+          ...getRecordConfig(xScaleConfig, 'grid'),
         },
         ticks: {
           color: colors.axisText,
           font: {
-            weight: options?.boldLabels
-              ? 'bold'
-              : 'normal',
+            weight: labelWeight,
+            ...(xFontSize !== undefined ? { size: xFontSize } : {}),
           },
-          ...getRecordConfig(
-            xScaleConfig,
-            'ticks',
-          ),
+          ...getRecordConfig(xScaleConfig, 'ticks'),
         },
       },
       y: {
         ...yScaleConfig,
         beginAtZero: false,
-        position:
-          yScaleConfig['position'] ?? 'right',
+        position: yScaleConfig['position'] ?? 'right',
         border: {
           display: true,
           color: colors.axisLine,
-          ...getRecordConfig(
-            yScaleConfig,
-            'border',
-          ),
+          ...getRecordConfig(yScaleConfig, 'border'),
         },
         grid: {
           display: true,
           drawTicks: true,
           color: colors.grid,
-          ...getRecordConfig(
-            yScaleConfig,
-            'grid',
-          ),
+          ...getRecordConfig(yScaleConfig, 'grid'),
         },
         ticks: {
           color: colors.axisText,
           font: {
-            weight: options?.boldLabels
-              ? 'bold'
-              : 'normal',
+            weight: labelWeight,
+            ...(yFontSize !== undefined ? { size: yFontSize } : {}),
           },
-          ...getRecordConfig(
-            yScaleConfig,
-            'ticks',
-          ),
+          ...getRecordConfig(yScaleConfig, 'ticks'),
         },
       },
       volume: {
@@ -420,26 +372,19 @@ export const createCandlestickChartOptions = ({
         ...volumeScaleConfig,
         grid: {
           display: false,
-          ...getRecordConfig(
-            volumeScaleConfig,
-            'grid',
-          ),
+          ...getRecordConfig(volumeScaleConfig, 'grid'),
         },
       },
     },
+
     plugins: {
       ...pluginOptions,
       candlestickCrosshair: {
         enabled: options?.crosshair ?? true,
         color: colors.crosshair,
-        labelBackground:
-          colors.crosshairLabelBackground,
-        labelColor:
-          colors.crosshairLabelText,
-        ...getRecordConfig(
-          pluginOptions,
-          'candlestickCrosshair',
-        ),
+        labelBackground: colors.crosshairLabelBackground,
+        labelColor: colors.crosshairLabelText,
+        ...getRecordConfig(pluginOptions, 'candlestickCrosshair'),
       },
       legend: {
         ...legendConfig,
@@ -447,21 +392,15 @@ export const createCandlestickChartOptions = ({
         labels: {
           color: colors.axisText,
           font: {
-            weight: options?.boldLegends
-              ? 'bold'
-              : 'normal',
+            weight: options?.boldLegends ? 'bold' : 'normal',
           },
-          ...getRecordConfig(
-            legendConfig,
-            'labels',
-          ),
+          ...getRecordConfig(legendConfig, 'labels'),
         },
       },
       tooltip: {
         mode: 'index',
         intersect: false,
-        backgroundColor:
-          colors.tooltipBackground,
+        backgroundColor: colors.tooltipBackground,
         titleColor: colors.tooltipText,
         bodyColor: colors.tooltipText,
         borderColor: colors.tooltipBorder,
@@ -470,10 +409,7 @@ export const createCandlestickChartOptions = ({
       },
       datalabels: {
         display: false,
-        ...getRecordConfig(
-          pluginOptions,
-          'datalabels',
-        ),
+        ...getRecordConfig(pluginOptions, 'datalabels'),
       },
     },
   };

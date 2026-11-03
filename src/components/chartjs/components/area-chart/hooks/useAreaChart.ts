@@ -1,7 +1,11 @@
+
+
+
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { CrosshairPlugin } from '@/components/chartjs/plugin/CrosshairPlugin';
 import { createPointHaloPlugin } from '@/components/chartjs/plugin/PointHaloPlugin';
 
 import type {
@@ -96,6 +100,7 @@ export const useAreaChart = ({
    */
   const plugins = useMemo<AreaChartHookReturn['plugins']>(
     () => [
+      CrosshairPlugin,
       createPointHaloPlugin({
         enabled: true,
         radiusOffset: AREA_CHART_CONFIG.haloRadiusOffset,

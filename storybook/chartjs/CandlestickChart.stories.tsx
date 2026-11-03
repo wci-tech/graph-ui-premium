@@ -307,7 +307,13 @@ export const Default = () => (
         description="OHLCV candlestick data rendered through the shared Chart API."
       />
       <Box customStyles={heroBox}>
-        <Chart type="candlestick" engine="chart-1" data={manualChartData} effect="none" />
+        <Chart
+          type="candlestick"
+          engine="chart-1"
+          showDownload
+          data={manualChartData}
+          effect="none"
+        />
       </Box>
     </div>
   </main>
@@ -630,6 +636,10 @@ export const CustomStyles = () => {
                   chartBackground: 'var(--candlestick-chart-bg-color)',
                   boldLabels: true,
                   boldLegends: true,
+                  fontSize: {
+                    x: 16,
+                    y: 16,
+                  },
                   onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
                     const firstElement = elements[0];
 
@@ -733,6 +743,10 @@ export const DarkBackground = () => (
             tooltipBorder: '#64748b',
           }}
           options={{
+            fontSize: {
+              x: 16,
+              y: 16,
+            },
             chartBackground: '#0f172a',
           }}
         />

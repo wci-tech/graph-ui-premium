@@ -24,6 +24,11 @@ export type ChartValue =
 
 export type ChartColor = string | CanvasGradient | CanvasPattern;
 
+export interface ChartAxisFontSize {
+  x?: number;
+  y?: number;
+}
+
 export type ScriptableChartColor =
   | ChartColor
   | ((context: ScriptableContext<'line'>) => ChartColor | null);
@@ -63,6 +68,7 @@ export type ChartJSOptions = {
   responsive?: boolean;
   maintainAspectRatio?: boolean;
   resizeDelay?: number;
+  fontSize?: ChartAxisFontSize;
   scales?: Record<string, unknown>;
   animation?: Record<string, unknown> & {
     duration?: number;

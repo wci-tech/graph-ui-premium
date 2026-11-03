@@ -18,11 +18,9 @@ export const BaseBarLineChart = ({
   appearance = 'smooth',
   effect,
   showTrendPoints = true,
-
   showDownload = true,
   downloadPlacement = 'top-right',
   rendererCustomStyles,
-
   customStyles,
   className,
   testId = 'bar-line-chart-test-id',
@@ -54,17 +52,11 @@ export const BaseBarLineChart = ({
 
   const chartjsProps: ChartjsProps = compactObject({
     type: 'bar' as const,
-
     data: processedData,
-
     options: barLineOptions,
-
     plugins,
-
     showDownload,
-
     downloadPlacement,
-
     customStyles: rendererCustomStyles,
   });
 

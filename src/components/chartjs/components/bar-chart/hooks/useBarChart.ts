@@ -1,3 +1,6 @@
+
+
+
 import {
   useLayoutEffect,
   useMemo,
@@ -6,6 +9,8 @@ import {
 } from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
+
+import { CrosshairPlugin } from '@/components/chartjs/plugin/CrosshairPlugin';
 
 import type {
   BarChartHookProps,
@@ -118,6 +123,18 @@ export const useBarChart = ({
   ]);
 
   /**
+   * BarChart-specific Chart.js plugins.
+   */
+  const plugins = useMemo<
+    BarChartHookReturn['plugins']
+  >(
+    () => [
+      CrosshairPlugin,
+    ],
+    [],
+  );
+
+  /**
    * Wrapper attributes used by tests,
    * styling and effects.
    */
@@ -146,6 +163,7 @@ export const useBarChart = ({
     wrapperRef,
     processedData,
     barOptions,
+    plugins,
     wrapperProps,
     isReady,
   };

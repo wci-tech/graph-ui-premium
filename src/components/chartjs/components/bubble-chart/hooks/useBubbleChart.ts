@@ -2,6 +2,8 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { compactObject } from '@wci-tech/core-ui-premium';
 
+import { CrosshairPlugin } from '@/components/chartjs/plugin/CrosshairPlugin';
+
 import {
     createBubbleChartData,
     createBubbleChartOptions,
@@ -27,10 +29,18 @@ export const useBubbleChart = ({
     const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
     const [resolvedColors, setResolvedColors] = useState<BubbleChartResolvedColors>();
 
+    /**
+     * Capture the chart wrapper after mount so Canvas colors
+     * can be resolved from computed CSS custom properties.
+     */
     useLayoutEffect(() => {
         setRootElement(wrapperRef.current);
     }, [customStyles?.wrapper, rendererCustomStyles?.container]);
 
+    /**
+     * Resolve CSS variables and consumer overrides
+     * before passing color values to the Canvas API.
+     */
     useLayoutEffect(() => {
         if (!rootElement) {
             return;
@@ -39,6 +49,10 @@ export const useBubbleChart = ({
         setResolvedColors(resolveBubbleChartColors(rootElement, colors));
     }, [rootElement, colors]);
 
+    /**
+     * Build the Chart.js BubbleChart data after all colors
+     * have been resolved.
+     */
     const processedData = useMemo<BubbleChartHookReturn['processedData']>(() => {
         if (!rootElement || !resolvedColors) {
             return {
@@ -53,6 +67,9 @@ export const useBubbleChart = ({
         });
     }, [data, resolvedColors, rootElement]);
 
+    /**
+     * Build the Chart.js options using resolved semantic colors.
+     */
     const bubbleOptions = useMemo<BubbleChartHookReturn['bubbleOptions']>(() => {
         if (!resolvedColors) {
             return undefined;
@@ -66,6 +83,15 @@ export const useBubbleChart = ({
         );
     }, [options, resolvedColors]);
 
+    /**
+     * BubbleChart-specific Chart.js plugins.
+     */
+    const plugins = useMemo<BubbleChartHookReturn['plugins']>(() => [CrosshairPlugin], []);
+
+    /**
+     * Wrapper attributes used by tests,
+     * styling and effects.
+     */
     const wrapperProps = useMemo<BubbleChartHookReturn['wrapperProps']>(
         () =>
             compactObject({
@@ -85,6 +111,7 @@ export const useBubbleChart = ({
         wrapperRef,
         processedData,
         bubbleOptions,
+        plugins,
         wrapperProps,
         isReady,
     };

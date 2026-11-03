@@ -1,9 +1,6 @@
 import type { TooltipItem } from 'chart.js';
 
-import {
-  CHART_COLOR_VARIABLES,
-  CHART_TOKEN_VARIABLES,
-} from '@/common/constants/Chart.colors';
+import { CHART_COLOR_VARIABLES, CHART_TOKEN_VARIABLES } from '@/common/constants/Chart.colors';
 import { isRecord } from '@/common/utils/Common.utils';
 import type {
   ChartJSData,
@@ -20,30 +17,25 @@ import type {
 
 import { BAR_CHART_CONFIG } from './BaseBarChart.constants';
 
-const CSS_VARIABLE_PATTERN =
-  /^var\(\s*(--[^,\s)]+)\s*(?:,\s*(.+))?\)$/;
+const CSS_VARIABLE_PATTERN = /^var\(\s*(--[^,\s)]+)\s*(?:,\s*(.+))?\)$/;
 
 const getRecordConfig = (
   source: Record<string, unknown> | undefined,
   key: string,
 ): Record<string, unknown> => {
   const value = source?.[key];
+
   return isRecord(value) ? value : {};
 };
 
 /**
  * Reads a required CSS custom property from the chart element.
  */
-const resolveCssVariable = (
-  styles: CSSStyleDeclaration,
-  variableName: string,
-): string => {
+const resolveCssVariable = (styles: CSSStyleDeclaration, variableName: string): string => {
   const value = styles.getPropertyValue(variableName).trim();
 
   if (!value) {
-    throw new Error(
-      `[BarChart] Missing required CSS variable "${variableName}".`,
-    );
+    throw new Error(`[BarChart] Missing required CSS variable "${variableName}".`);
   }
 
   return value;
@@ -55,10 +47,7 @@ const resolveCssVariable = (
  * Canvas APIs cannot understand CSS var() expressions directly,
  * therefore CSS variables are converted to computed values.
  */
-const resolveColor = (
-  styles: CSSStyleDeclaration,
-  color: string,
-): string => {
+const resolveColor = (styles: CSSStyleDeclaration, color: string): string => {
   const normalizedColor = color.trim();
   const match = normalizedColor.match(CSS_VARIABLE_PATTERN);
 
@@ -84,19 +73,12 @@ const resolveColor = (
     return resolveColor(styles, fallback);
   }
 
-  throw new Error(
-    `[BarChart] Unable to resolve CSS color variable "${variableName}".`,
-  );
+  throw new Error(`[BarChart] Unable to resolve CSS color variable "${variableName}".`);
 };
 
-const resolveDefaultSeriesColors = (
-  styles: CSSStyleDeclaration,
-): readonly string[] =>
+const resolveDefaultSeriesColors = (styles: CSSStyleDeclaration): readonly string[] =>
   CHART_COLOR_VARIABLES.map((variableName) =>
-    resolveColor(
-      styles,
-      resolveCssVariable(styles, variableName),
-    ),
+    resolveColor(styles, resolveCssVariable(styles, variableName)),
   );
 
 const resolveTokenColor = (
@@ -106,10 +88,7 @@ const resolveTokenColor = (
 ): string =>
   color
     ? resolveColor(styles, color)
-    : resolveColor(
-      styles,
-      resolveCssVariable(styles, variableName),
-    );
+    : resolveColor(styles, resolveCssVariable(styles, variableName));
 
 /**
  * Resolves all chart-level colors.
@@ -123,30 +102,15 @@ export const resolveBarChartColors = (
 ): BarChartResolvedColors => {
   const styles = getComputedStyle(element);
 
-  const series =
-    colors?.series?.length
-      ? colors.series.map((color) =>
-        resolveColor(styles, color),
-      )
-      : resolveDefaultSeriesColors(styles);
+  const series = colors?.series?.length
+    ? colors.series.map((color) => resolveColor(styles, color))
+    : resolveDefaultSeriesColors(styles);
 
   return {
     series,
-    axisText: resolveTokenColor(
-      styles,
-      colors?.axisText,
-      CHART_TOKEN_VARIABLES.axisText,
-    ),
-    axisLine: resolveTokenColor(
-      styles,
-      colors?.axisLine,
-      CHART_TOKEN_VARIABLES.axisLine,
-    ),
-    grid: resolveTokenColor(
-      styles,
-      colors?.grid,
-      CHART_TOKEN_VARIABLES.grid,
-    ),
+    axisText: resolveTokenColor(styles, colors?.axisText, CHART_TOKEN_VARIABLES.axisText),
+    axisLine: resolveTokenColor(styles, colors?.axisLine, CHART_TOKEN_VARIABLES.axisLine),
+    grid: resolveTokenColor(styles, colors?.grid, CHART_TOKEN_VARIABLES.grid),
     tooltipBackground: resolveTokenColor(
       styles,
       colors?.tooltipBackground,
@@ -184,13 +148,35 @@ const getSeriesColor = (
   const color = colors.series[index % colors.series.length];
 
   if (!color) {
-    throw new Error(
-      '[BarChart] At least one series color is required.',
-    );
+    throw new Error('[BarChart] At least one series color is required.');
   }
 
   return resolveColor(styles, color);
 };
+
+/**
+ * Rounds only the value-end corners of the bar.
+ *
+ * Vertical:
+ * top-left + top-right rounded.
+ *
+ * Horizontal:
+ * top-right + bottom-right rounded.
+ */
+const getBarBorderRadius = (radius: number, horizontal: boolean) =>
+  horizontal
+    ? {
+      topLeft: 0,
+      topRight: radius,
+      bottomLeft: 0,
+      bottomRight: radius,
+    }
+    : {
+      topLeft: radius,
+      topRight: radius,
+      bottomLeft: 0,
+      bottomRight: 0,
+    };
 
 /**
  * Creates the final Chart.js BarChart dataset configuration.
@@ -211,45 +197,30 @@ export const createBarChartData = ({
   readonly options?: BarChartOptions;
 }): ChartJSData => {
   const styles = getComputedStyle(rootElement);
+  const horizontal = options?.horizontal === true;
 
   return {
     labels,
     datasets: data.map<ChartJSDataset>((dataset, index) => {
-      const barColor = getSeriesColor(
-        dataset,
-        index,
-        colors,
-        styles,
-      );
-
-      const barWidth =
-        dataset.barWidth ??
-        options?.barWidth ??
-        BAR_CHART_CONFIG.barWidth;
+      const barColor = getSeriesColor(dataset, index, colors, styles);
+      const barWidth = dataset.barWidth ?? options?.barWidth ?? BAR_CHART_CONFIG.barWidth;
+      const borderRadius = dataset.borderRadius ?? BAR_CHART_CONFIG.borderRadius;
 
       return {
         ...dataset,
         backgroundColor: barColor,
         borderColor: barColor,
-        borderWidth:
-          dataset.borderWidth ??
-          BAR_CHART_CONFIG.borderWidth,
-        borderRadius:
-          dataset.borderRadius ??
-          BAR_CHART_CONFIG.borderRadius,
+        borderWidth: dataset.borderWidth ?? BAR_CHART_CONFIG.borderWidth,
+        borderRadius: getBarBorderRadius(borderRadius, horizontal),
         borderSkipped: false,
         barThickness: barWidth,
-        maxBarThickness:
-          dataset.maxBarWidth ??
-          barWidth,
+        maxBarThickness: dataset.maxBarWidth ?? barWidth,
         categoryPercentage:
           dataset.categoryPercentage ??
           options?.categoryPercentage ??
           BAR_CHART_CONFIG.categoryPercentage,
         barPercentage:
-          dataset.barPercentage ??
-          options?.barPercentage ??
-          BAR_CHART_CONFIG.barPercentage,
+          dataset.barPercentage ?? options?.barPercentage ?? BAR_CHART_CONFIG.barPercentage,
       };
     }),
   };
@@ -268,101 +239,47 @@ export const createBarChartOptions = ({
   readonly options?: BarChartOptions;
   readonly colors: BarChartResolvedColors;
 }): ChartJSOptions => {
-  const optionRecord = isRecord(options)
-    ? options
-    : undefined;
+  const optionRecord = isRecord(options) ? options : undefined;
 
-  const scalesConfig = getRecordConfig(
-    optionRecord,
-    'scales',
-  );
-  const xScaleConfig = getRecordConfig(
-    scalesConfig,
-    'x',
-  );
-  const yScaleConfig = getRecordConfig(
-    scalesConfig,
-    'y',
-  );
-  const xGridConfig = getRecordConfig(
-    xScaleConfig,
-    'grid',
-  );
-  const yGridConfig = getRecordConfig(
-    yScaleConfig,
-    'grid',
-  );
-  const xBorderConfig = getRecordConfig(
-    xScaleConfig,
-    'border',
-  );
-  const yBorderConfig = getRecordConfig(
-    yScaleConfig,
-    'border',
-  );
-  const xTicksConfig = getRecordConfig(
-    xScaleConfig,
-    'ticks',
-  );
-  const yTicksConfig = getRecordConfig(
-    yScaleConfig,
-    'ticks',
-  );
+  const scalesConfig = getRecordConfig(optionRecord, 'scales');
+  const xScaleConfig = getRecordConfig(scalesConfig, 'x');
+  const yScaleConfig = getRecordConfig(scalesConfig, 'y');
 
-  const pluginOptions = getRecordConfig(
-    optionRecord,
-    'plugins',
-  );
-  const legendConfig = getRecordConfig(
-    pluginOptions,
-    'legend',
-  );
-  const legendLabelsConfig = getRecordConfig(
-    legendConfig,
-    'labels',
-  );
-  const tooltipConfig = getRecordConfig(
-    pluginOptions,
-    'tooltip',
-  );
-  const tooltipCallbacksConfig = getRecordConfig(
-    tooltipConfig,
-    'callbacks',
-  );
-  const datalabelsConfig = getRecordConfig(
-    pluginOptions,
-    'datalabels',
-  );
-  const crosshairConfig = getRecordConfig(
-    pluginOptions,
-    'crosshair',
-  );
-  const candlestickCrosshairConfig = getRecordConfig(
-    pluginOptions,
-    'candlestickCrosshair',
-  );
-  const interactionConfig = getRecordConfig(
-    optionRecord,
-    'interaction',
-  );
+  const xGridConfig = getRecordConfig(xScaleConfig, 'grid');
+  const yGridConfig = getRecordConfig(yScaleConfig, 'grid');
 
-  const crosshairEnabled =
-    options?.crosshair ?? false;
+  const xBorderConfig = getRecordConfig(xScaleConfig, 'border');
+  const yBorderConfig = getRecordConfig(yScaleConfig, 'border');
 
-  const labelWeight = options?.boldLabels
-    ? 'bold'
-    : 'normal';
+  const xTicksConfig = getRecordConfig(xScaleConfig, 'ticks');
+  const yTicksConfig = getRecordConfig(yScaleConfig, 'ticks');
+
+  const pluginOptions = getRecordConfig(optionRecord, 'plugins');
+  const legendConfig = getRecordConfig(pluginOptions, 'legend');
+  const legendLabelsConfig = getRecordConfig(legendConfig, 'labels');
+  const tooltipConfig = getRecordConfig(pluginOptions, 'tooltip');
+  const tooltipCallbacksConfig = getRecordConfig(tooltipConfig, 'callbacks');
+  const datalabelsConfig = getRecordConfig(pluginOptions, 'datalabels');
+  const crosshairConfig = getRecordConfig(pluginOptions, 'crosshair');
+  const interactionConfig = getRecordConfig(optionRecord, 'interaction');
+
+  const xFontSize = options?.fontSize?.x;
+  const yFontSize = options?.fontSize?.y;
+  const crosshairEnabled = options?.crosshair === true;
+  const labelWeight = options?.boldLabels ? 'bold' : 'normal';
 
   return {
     ...options,
     indexAxis: options?.horizontal ? 'y' : 'x',
     responsive: true,
     maintainAspectRatio: false,
+
     interaction: {
-      mode: 'nearest',
-      intersect: true,
+      mode: crosshairEnabled ? 'index' : 'nearest',
+      intersect: !crosshairEnabled,
       ...interactionConfig,
     },
+
     scales: {
       ...scalesConfig,
       x: {
@@ -380,6 +297,7 @@ export const createBarChartOptions = ({
           color: colors.axisText,
           font: {
             weight: labelWeight,
+            ...(xFontSize !== undefined ? { size: xFontSize } : {}),
           },
           ...xTicksConfig,
         },
@@ -400,20 +318,23 @@ export const createBarChartOptions = ({
           color: colors.axisText,
           font: {
             weight: labelWeight,
+            ...(yFontSize !== undefined ? { size: yFontSize } : {}),
           },
           ...yTicksConfig,
         },
       },
     },
+
     plugins: {
       ...pluginOptions,
       crosshair: {
         enabled: crosshairEnabled,
+        color: colors.axisText,
+        lineWidth: 1,
+        lineDash: [4, 4],
+        showVertical: true,
+        showHorizontal: true,
         ...crosshairConfig,
-      },
-      candlestickCrosshair: {
-        enabled: crosshairEnabled,
-        ...candlestickCrosshairConfig,
       },
       legend: {
         display: options?.showLegend ?? true,
@@ -427,19 +348,16 @@ export const createBarChartOptions = ({
           padding: BAR_CHART_CONFIG.legendPadding,
           color: colors.axisText,
           font: {
-            weight: options?.boldLegends
-              ? 'bold'
-              : 'normal',
+            weight: options?.boldLegends ? 'bold' : 'normal',
           },
           ...legendLabelsConfig,
         },
       },
       tooltip: {
-        mode: 'nearest',
-        intersect: true,
+        mode: crosshairEnabled ? 'index' : 'nearest',
+        intersect: !crosshairEnabled,
         position: 'nearest',
-        caretPadding:
-          BAR_CHART_CONFIG.tooltipCaretPadding,
+        caretPadding: BAR_CHART_CONFIG.tooltipCaretPadding,
         backgroundColor: colors.tooltipBackground,
         titleColor: colors.tooltipText,
         bodyColor: colors.tooltipText,
@@ -447,12 +365,8 @@ export const createBarChartOptions = ({
         ...tooltipConfig,
         callbacks: {
           label: (context: TooltipItem<'bar'>) => {
-            const datasetLabel =
-              context.dataset.label ?? 'Dataset';
-
-            const value = options?.horizontal
-              ? context.parsed.x
-              : context.parsed.y;
+            const datasetLabel = context.dataset.label ?? 'Dataset';
+            const value = options?.horizontal ? context.parsed.x : context.parsed.y;
 
             return `${datasetLabel}: ${value}`;
           },
@@ -465,6 +379,7 @@ export const createBarChartOptions = ({
         ...datalabelsConfig,
       },
     },
+
     onClick: options?.['onClick'],
   };
 };

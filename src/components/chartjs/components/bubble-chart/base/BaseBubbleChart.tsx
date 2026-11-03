@@ -24,18 +24,19 @@ export const BaseBubbleChart = ({
 }: BaseBubbleChartProps) => {
   const styles = useStyles(options);
 
-  const { wrapperRef, processedData, bubbleOptions, wrapperProps, isReady } = useBubbleChart(
-    compactObject({
-      data,
-      colors,
-      options,
-      effect,
-      customStyles,
-      rendererCustomStyles,
-      className,
-      testId,
-    }),
-  );
+  const { wrapperRef, processedData, bubbleOptions, plugins, wrapperProps, isReady } =
+    useBubbleChart(
+      compactObject({
+        data,
+        colors,
+        options,
+        effect,
+        customStyles,
+        rendererCustomStyles,
+        className,
+        testId,
+      }),
+    );
 
   const wrapperStyles = [styles.wrapper, customStyles?.wrapper, rendererCustomStyles?.container];
 
@@ -47,6 +48,7 @@ export const BaseBubbleChart = ({
     type: 'bubble' as const,
     data: processedData,
     options: bubbleOptions,
+    plugins,
     showDownload,
     downloadPlacement,
     customStyles: rendererCustomStyles,
